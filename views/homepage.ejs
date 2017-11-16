@@ -9,7 +9,7 @@
         <script src="socket.io/socket.io.js"></script>
         <script src="tab_content.js"></script>
         <script>
-              var socket=io("http://localhost:3000");
+              var socket=io();
               socket.on("Fail_in_login",function(data){
               $("#status").text('Fail in login !');
               alert("Account name or password is wrong !");
