@@ -40,26 +40,6 @@ app.post("/submitfile",multipartMiddleware,function(req,res,next){
   else console.log(err);
     });
 });
-io.on("connection",function(socket){
-console.log("Co nguoi ket noi  "+socket.id);
-    socket.on("login",function(data){
-    dataobj.check_login_csv(data[0],data[1])
-    .then(result=>{socket.emit("Success_in_login","Success_in_login");},error=>
-    {socket.emit("Fail_in_login","Fail_in_login");console.log(error);});
-    });
-    socket.on("wait_for_point",function(id){
-    let id_pathfile=__dirname+"/Data/"+id+"/output.txt";
-    let output_fs=require('fs');
-    output_fs.readFile(id_pathfile,function(err,data){
-    if(err) console.log(err);
-      else
-        {
-          socket.emit("get_point",data.toString('utf8'));
-          output_fs.unlink(id_pathfile);
-        }
-      });
-    });
-});
 app.get("/",function(req,res){
   res.render("homepage");
 });
@@ -68,3 +48,25 @@ app.get("/",function(req,res){
 server.listen(port, () => {
   console.log(`Server is running on ${port}`);
 });
+
+
+io.on("connection",function(socket){
+  console.log("Co nguoi ket noi  "+socket.id);
+      socket.on("login",function(data){
+      dataobj.check_login_csv(data[0],data[1])
+      .then(result=>{socket.emit("Success_in_login","Success_in_login");},error=>
+      {socket.emit("Fail_in_login","Fail_in_login");console.log(error);});
+      });
+      socket.on("wait_for_point",function(id){
+      let id_pathfile=__dirname+"/Data/"+id+"/output.txt";
+      let output_fs=require('fs');
+      output_fs.readFile(id_pathfile,function(err,data){
+      if(err) console.log(err);
+        else
+          {
+            socket.emit("get_point",data.toString('utf8'));
+            output_fs.unlink(id_pathfile);
+          }
+        });
+      });
+  });
