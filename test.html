@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <style type="text/css">
+    .khungtieude{
+      height: 50px;
+      width: 100%;
+      background-color: powderblue;
+      text-align: center;
+      color: white;
+    }
+    .khunglonbaoquanh{
+      width: 30%;
+      height: 230px;
+      background-color: #E6E6FA;
+      margin: auto;
+    }
+    .ghinhandata{
+      width: 340px;
+      height: 30px;
+      margin: auto;
+    }
+    .divghinhandata{
+      padding-top: 10px;
+      padding-bottom: 10px;
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+    .buttonloggin{
+      background-color: powderblue;
+      text-align: center;
+      color: white;
+    }
+    .divstatus{
+      height: 50px;
+      width: 100%;
+      background-color: red;
+      text-align: center;
+      color: white;
+      font-size: 20px;
+    }
+    </style>
+    <head>
+        <meta charset="utf-8" />
+        <title>Trang chủ</title>
+    </head>
+    <body>
+        <form method="post" action="/login" id="form" enctype="multipart/form-data">
+         <div class="khunglonbaoquanh">
+            <div class="khungtieude">
+                <h1>Login</h1>
+            </div>
+            <div class="divghinhandata">
+                <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"></input>
+            </div>
+            <div class="divghinhandata">
+            <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"></input>
+            </div>
+            <div class="divghinhandata">
+            <input type="submit" value="Login" name="submit" class="ghinhandata" style="background-color: powderblue;text-align: center;color: white;">
+            </div>
+            <div class="divstatus">
+              <p style="padding-top: 10px"> Login </p>
+            </div>
+        </div>
+        </form>
+    </body>
+</html>

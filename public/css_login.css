@@ -1,0 +1,37 @@
+.khungtieude{
+  height: 50px;
+  width: 100%;
+  background-color: powderblue;
+  text-align: center;
+  color: white;
+}
+.khunglonbaoquanh{
+  width: 30%;
+  height: 230px;
+  background-color: #E6E6FA;
+  margin: auto;
+}
+.ghinhandata{
+  width: 340px;
+  height: 30px;
+  margin: auto;
+}
+.divghinhandata{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.buttonloggin{
+  background-color: powderblue;
+  text-align: center;
+  color: white;
+}
+.divstatus{
+  height: 50px;
+  width: 100%;
+  background-color: red;
+  text-align: center;
+  color: white;
+  font-size: 20px;
+}
