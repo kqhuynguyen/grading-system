@@ -8,11 +8,11 @@ var dataobj=require("./testdatabase.js");
 var server=require("http").Server(app);
 var io=require("socket.io")(server);
 var exec = require('child_process').execFile;
-
+const port = process.env.PORT || 3000;
 app.use(express.static("public"));
 app.set("view engine","ejs");
 app.set("views","./views");
-server.listen(3000,"127.0.0.1");
+server.listen(port,"127.0.0.1");
 /*let exe_file=__dirname+"/Boost/Debug/Boost.exe";
 exec(exe_file, function(err, data) {
     console.log(err)
