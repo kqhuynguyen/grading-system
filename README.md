@@ -1,3 +1,7 @@
+``` install npm packages
+npm i
+```
+
 # HỆ THỐNG CHẤM ĐIỂM TỰ ĐỘNG PROGRAMMING TRÊN HTML
 ## Chương trình
 ### Cơ chế
