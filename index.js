@@ -2,17 +2,19 @@ var express=require("express");
 var app=express();
 var multipart=require("connect-multiparty");
 var multipartMiddleware=multipart();
-var mysql=require("mysql");
 var fs=require("fs");
 var dataobj=require("./testdatabase.js");
-var server=require("http").Server(app);
-var io=require("socket.io")(server);
 var exec = require('child_process').execFile;
+// server created from Express's requests handler
+var server = require('http').createServer(app);
+// socket io initialization
+var io = require('socket.io')(server);
 const port = process.env.PORT || 3000;
+
+// set the static folder for public resources
 app.use(express.static("public"));
 app.set("view engine","ejs");
 app.set("views","./views");
-server.listen(port,"127.0.0.1");
 /*let exe_file=__dirname+"/Boost/Debug/Boost.exe";
 exec(exe_file, function(err, data) {
     console.log(err)
@@ -60,4 +62,9 @@ console.log("Co nguoi ket noi  "+socket.id);
 });
 app.get("/",function(req,res){
   res.render("homepage");
+});
+
+// start the server
+server.listen(port, () => {
+  console.log(`Server is running on ${port}`);
 });
