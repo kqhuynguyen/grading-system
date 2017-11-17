@@ -1,37 +1,63 @@
-.khungtieude{
-  height: 50px;
-  width: 100%;
-  background-color: powderblue;
-  text-align: center;
-  color: white;
-}
-.khunglonbaoquanh{
-  width: 30%;
-  height: 230px;
-  background-color: #E6E6FA;
-  margin: auto;
-}
-.ghinhandata{
-  width: 340px;
-  height: 30px;
-  margin: auto;
-}
-.divghinhandata{
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 30px;
-  padding-right: 30px;
-}
-.buttonloggin{
-  background-color: powderblue;
-  text-align: center;
-  color: white;
-}
-.divstatus{
-  height: 50px;
-  width: 100%;
-  background-color: red;
-  text-align: center;
-  color: white;
-  font-size: 20px;
-}
+    body {
+        background: url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) repeat-x center center fixed;
+        background-size: 100%;
+        -webkit-background-size: 100%;
+        -moz-background-size: 100%;
+        -o-background-size: 100%;
+    }
+    
+    h1,
+    p {
+        font-family: "Leelawadee UI";
+    }
+    
+    .khungtieude {
+        padding-top: 2%;
+        height: 30%;
+        width: 100%;
+        text-align: center;
+        color: #1c1c1c;
+    }
+    
+    .khunglonbaoquanh {
+        border-radius: 5px;
+        margin-top: 12%;
+        margin-left: 35%;
+        width: 30%;
+        height: 350px;
+        background-color: #ffffff;
+    }
+    
+    .ghinhandata {
+        width: 340px;
+        height: 30px;
+        background-color: #f1f1f1;
+        border: none;
+        border-radius: 4px;
+        padding-left: 3%;
+        padding-right: 3%;
+    }
+    
+    .divghinhandata {
+        padding-left: 5.5%;
+        padding-bottom: 4%;
+    }
+    
+    .buttonloggin {
+        width: 340px;
+        height: 30px;
+        background-color: #2980b9;
+        text-align: center;
+        color: white;
+        border-radius: 4px;
+        border: none;
+        margin-left: 4%;
+    }
+    
+    .divstatus {
+        height: 50px;
+        width: 100%;
+        text-align: center;
+        color: #c0392b;
+        font-size: 20px;
+    }
