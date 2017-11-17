@@ -1,51 +1,62 @@
 <!DOCTYPE html>
+<meta charset="UTF-8">
 <html>
-    <style type="text/css">
-    .khungtieude{
-      height: 50px;
-      width: 100%;
-      background-color: powderblue;
-      text-align: center;
-      color: white;
+<style type="text/css">
+    h1,
+    p {
+        font-family: "Leelawadee UI";
     }
-    .khunglonbaoquanh{
-      width: 30%;
-      height: 230px;
-      background-color: #E6E6FA;
-      margin: auto;
+    
+    .khungtieude {
+        height: 50px;
+        width: 100%;
+        text-align: center;
+        color: #1c1c1c;
     }
-    .ghinhandata{
-      width: 340px;
-      height: 30px;
-      margin: auto;
+    
+    .khunglonbaoquanh {
+        width: 30%;
+        height: 230px;
+        background-color: #F1F1F1;
+        margin: auto;
     }
-    .divghinhandata{
-      padding-top: 10px;
-      padding-bottom: 10px;
-      padding-left: 30px;
-      padding-right: 30px;
+    
+    .ghinhandata {
+        width: 340px;
+        height: 30px;
+        margin: auto;
     }
-    .buttonloggin{
-      background-color: powderblue;
-      text-align: center;
-      color: white;
+    
+    .divghinhandata {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 30px;
+        padding-right: 30px;
     }
-    .divstatus{
-      height: 50px;
-      width: 100%;
-      background-color: red;
-      text-align: center;
-      color: white;
-      font-size: 20px;
+    
+    .buttonloggin {
+        background-color: #2980b9;
+        text-align: center;
+        color: white;
     }
-    </style>
-    <head>
-        <meta charset="utf-8" />
-        <title>Trang chủ</title>
-    </head>
-    <body>
-        <form method="post" action="/login" id="form" enctype="multipart/form-data">
-         <div class="khunglonbaoquanh">
+    
+    .divstatus {
+        height: 50px;
+        width: 100%;
+        text-align: center;
+        color: #c0392b;
+        font-size: 20px;
+    }
+</style>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Login</title>
+</head>
+
+<body>
+    <form method="post" action="/login" id="form" enctype="multipart/form-data">
+        <div class="khunglonbaoquanh">
             <div class="khungtieude">
                 <h1>Login</h1>
             </div>
@@ -53,15 +64,16 @@
                 <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"></input>
             </div>
             <div class="divghinhandata">
-            <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"></input>
+                <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"></input>
             </div>
             <div class="divghinhandata">
-            <input type="submit" value="Login" name="submit" class="ghinhandata" style="background-color: powderblue;text-align: center;color: white;">
+                <input type="submit" value="Login" name="submit" class="ghinhandata" style="background-color: powderblue;text-align: center;color: white;">
             </div>
             <div class="divstatus">
-              <p style="padding-top: 10px"> Login </p>
+                <p style="padding-top: 10px"> Login </p>
             </div>
         </div>
-        </form>
-    </body>
+    </form>
+</body>
+
 </html>
