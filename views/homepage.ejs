@@ -1,112 +1,113 @@
 <!DOCTYPE html>
 <html>
-      <head>
-        <link rel="stylesheet" href="css_login.css">
-        <link rel="stylesheet" href="css_tab.css">
-        <meta charset="utf-8" />
-        <title>Trang chủ</title>
-        <script src="jquery.js"></script>
-        <script src="socket.io/socket.io.js"></script>
-        <script src="tab_content.js"></script>
-        <script>
-              var socket=io();
-              socket.on("Fail_in_login",function(data){
-              $("#status").text('Fail in login !');
-              alert("Account name or password is wrong !");
-              });
-              socket.on("Success_in_login",function(data){
-              alert("Login successfully !");
-              $("#status").text('Login successfully !');
-              $("#form_login").hide(2000);
-              $("#form_submit").show(1000);
-              $("#nowuser").text('Hello '+$("#username").val());
-            });
-            socket.on("get_point",function(data){
-                $("#pa_result").text(data);
-            });
-              $(document).ready(function(){
-              $("#form_submit").hide();
-              //$("#form_login").hide();
-              $("#btn_view_result").hide();
-              $("#btnlogin").click(function(){
-              let data=new Array($("#username").val(),$("#password").val());
-              socket.emit("login",data);
-                });
-              $("#view_result").click(function()
-              {
-                socket.emit("wait_for_point",$("#username").val());
-              });
-              $("#send_file").click(function(){
-                  $("#btn_view_result").show(5000);
-              });
-          });
 
-        </script>
-    </head>
-    <body>
-        <div class="khunglonbaoquanh" id="form_login">
-            <div class="khungtieude">
-                <h1>Login</h1>
-            </div>
-            <div class="divghinhandata">
-                <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"></input>
-            </div>
-            <div class="divghinhandata">
-            <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"></input>
-            </div>
-            <div class="divghinhandata">
-            <input type="submit" value="Login" name="submit" class="ghinhandata" style="background-color: powderblue;text-align: center;color: white;" id="btnlogin">
-            </div>
-            <div class="divstatus">
-              <p style="padding-top: 10px" id="status"> Login </p>
-            </div>
+<head>
+    <link rel="stylesheet" href="css_login.css">
+    <link rel="stylesheet" href="css_tab.css">
+    <meta charset="utf-8" />
+    <title>Login Page</title>
+    <script src="jquery.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="tab_content.js"></script>
+    <script>
+        var socket = io();
+        socket.on("Fail_in_login", function(data) {
+            $("#status").text('Fail in login !');
+            alert("Account name or password is wrong !");
+        });
+        socket.on("Success_in_login", function(data) {
+            alert("Login successfully !");
+            $("#status").text('Login successfully !');
+            $("#form_login").hide(2000);
+            $("#form_submit").show(1000);
+            $("#nowuser").text('Hello ' + $("#username").val());
+        });
+        socket.on("get_point", function(data) {
+            $("#pa_result").text(data);
+        });
+        $(document).ready(function() {
+            $("#form_submit").hide();
+            //$("#form_login").hide();
+            $("#btn_view_result").hide();
+            $("#btnlogin").click(function() {
+                let data = new Array($("#username").val(), $("#password").val());
+                socket.emit("login", data);
+            });
+            $("#view_result").click(function() {
+                socket.emit("wait_for_point", $("#username").val());
+            });
+            $("#send_file").click(function() {
+                $("#btn_view_result").show(5000);
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="khunglonbaoquanh" id="form_login">
+        <div class="khungtieude">
+            <h1>Log In</h1>
         </div>
-        <div id="form_submit">
+        <div class="divghinhandata">
+            <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"></input>
+        </div>
+        <div class="divghinhandata">
+            <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"></input>
+        </div>
+        <div class="divghinhandata">
+            <input type="submit" value="Login" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin">
+        </div>
+        <div class="divstatus">
+            <p style="padding-top: 10px" id="status"> Login </p>
+        </div>
+    </div>
+    <div id="form_submit">
         <div class="tab">
             <button class="tablinks" onclick="openCity(event, 'London')">Submit</button>
             <button class="tablinks" onclick="openCity(event, 'Paris')">Points</button>
             <button class="tablinks" onclick="openCity(event, 'Tokyo')">Chat</button>
             <button class="tablinks" onclick="openCity(event, 'Tokyo')">Rank</button>
-            <button style="float:right;color:white;background-color:#0033FF;" onclick="logout()">Logout</button>
+            <button style="float:right;color:white;background-color: #2980b9;" onclick="logout()">Log out</button>
         </div>
         <div id="London" class="tabcontent">
-          <form action="/submitfile" method="post" enctype="multipart/form-data">
-           <div>
-              <h3 id="nowuser"></h3>
-           </div>
-           <div class="side_submit">
-             <div style="text-align:center;background-color:#68228B;color:white">
-               <h3> Assignment</h3>
-             </div>
-             <div style="text-align:left;font-size:14px;font-family:Arial">
-               <p><b><u>Đề bài:</u><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
-             </div>
-             <div>
-               <input type="file" id="file" name="file"></input>
-               <input type="submit" id="send_file"></input>
-             </div>
-           </div>
-           <div class="side_result">
-             <div style="text-align:center;background-color:#68228B;color:white">
-               <h3>Result</h3>
-             </div>
-             <div style="text-align:left;font-size:14px;font-family:Arial">
-               <p id="pa_result"><b></b></p>
-             </div>
-             <div style="float:right" id="btn_view_result">
-                <button id="view_result">Xem kết quả</button>
-             </div>
-           </div>
-          </form>
+            <form action="/submitfile" method="post" enctype="multipart/form-data">
+                <div>
+                    <h3 id="nowuser"></h3>
+                </div>
+                <div class="side_submit">
+                    <div style="text-align:center;background-color:#68228B;color:white">
+                        <h3> Assignment</h3>
+                    </div>
+                    <div style="text-align:left;font-size:14px">
+                        <p><b><u>Đề bài:</u><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
+                    </div>
+                    <div>
+                        <input type="file" id="file" name="file"></input>
+                        <input type="submit" id="send_file"></input>
+                    </div>
+                </div>
+                <div class="side_result">
+                    <div style="text-align:center;background-color:#68228B;color:white">
+                        <h3>Result</h3>
+                    </div>
+                    <div style="text-align:left;font-size:14px">
+                        <p id="pa_result"><b></b></p>
+                    </div>
+                    <div style="float:right" id="btn_view_result">
+                        <button id="view_result">Xem kết quả</button>
+                    </div>
+                </div>
+            </form>
         </div>
         <div id="Paris" class="tabcontent">
-          <h3>Paris</h3>
-          <p>Paris is the capital of France.</p>
+            <h3>Paris</h3>
+            <p>Paris is the capital of France.</p>
         </div>
         <div id="Tokyo" class="tabcontent">
-          <h3>Tokyo</h3>
-          <p>Tokyo is the capital of Japan.</p>
+            <h3>Tokyo</h3>
+            <p>Tokyo is the capital of Japan.</p>
         </div>
-      </div>
-    </body>
+    </div>
+</body>
+
 </html>

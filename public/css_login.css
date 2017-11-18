@@ -29,7 +29,7 @@
     }
     
     .ghinhandata {
-        width: 340px;
+        width: 90%;
         height: 30px;
         background-color: #f1f1f1;
         border: none;
@@ -43,15 +43,15 @@
         padding-bottom: 4%;
     }
     
-    .buttonloggin {
-        width: 340px;
+    .buttonlogin {
+        width: 80%;
         height: 30px;
         background-color: #2980b9;
         text-align: center;
         color: white;
         border-radius: 4px;
         border: none;
-        margin-left: 4%;
+        margin-left: 10%;
     }
     
     .divstatus {

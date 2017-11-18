@@ -1,10 +1,16 @@
+body {
+    font-family: "Leelawadee UI";
+}
+
 div.tab {
     overflow: hidden;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
 }
 
+
 /* Style the buttons inside the tab */
+
 div.tab button {
     background-color: inherit;
     float: left;
@@ -14,50 +20,67 @@ div.tab button {
     padding: 14px 16px;
     transition: 0.3s;
     width: 150px;
-    color: red;
     font-size: 20px;
 }
+
+
 /* Change background color of buttons on hover */
+
 div.tab button:hover {
     background-color: #ddd;
 }
 
+
 /* Create an active/current tablink class */
+
 div.tab button.active {
     background-color: #ccc;
 }
 
+
 /* Style the tab content */
+
 .tabcontent {
     display: none;
     padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-top: none;
     height: 100vh;
+    background-color: rgba(255, 255, 255, 0.5);
+}
 
-}
 .tabcontent {
--webkit-animation: fadeEffect 1s;
-animation: fadeEffect 1s; /* Fading effect takes 1 second */
+    -webkit-animation: fadeEffect 1s;
+    animation: fadeEffect 1s;
+    /* Fading effect takes 1 second */
 }
-.side_submit{
+
+.side_submit {
     height: 480px;
     width: 50%;
     float: left;
     background-color: #C6E2FF
 }
-.side_result{
-  height: 480px;
-  width: 50%;
-  float: right;
-  background-color: #FFC0CB
+
+.side_result {
+    height: 480px;
+    width: 50%;
+    float: right;
+    background-color: #FFC0CB
 }
+
 @-webkit-keyframes fadeEffect {
-from {opacity: 0;}
-to {opacity: 1;}
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes fadeEffect {
-from {opacity: 0;}
-to {opacity: 1;}
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
