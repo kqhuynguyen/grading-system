@@ -10,21 +10,13 @@ var server = require('http').createServer(app);
 // socket io initialization
 var io = require('socket.io')(server);
 const port = process.env.PORT || 3000;
-
 // set the static folder for public resources
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", "./views");
-/*let exe_file=__dirname+"/Boost/Debug/Boost.exe";
-exec(exe_file, function(err, data) {
-    console.log(err)
-    console.log(data.toString());
-});*/
 app.post("/submitfile", multipartMiddleware, function(req, res, next) {
     var file = req.files.file;
     var originalFilename = file.name;
-    // var filesType = file.type.split('/')[1];
-    // var fileSize = file.size;
     var pathUpload = __dirname + "/Data/" + originalFilename.split('.')[0] + "/" + originalFilename;
     fs.readFile(file.path, function(err, data) {
         if (!err) {
@@ -68,4 +60,16 @@ io.on("connection", function(socket) {
             }
         });
     });
+    socket.on("signup",function(data){
+       let add_new_line=require('./testdatabase.js');
+       add_new_line.check_account_existence(data[0],function(exist){
+       console.log(exist);
+       if(exist) socket.emit('Exist this account',data[0]);
+       else {
+         let new_line_account=data[0]+','+data[2]+','+data[1]+'\r\n';
+         add_new_line.add_new_account(new_line_account);
+         socket.emit("signup_successfully",data[0])
+      }
+    });
+  });
 });
