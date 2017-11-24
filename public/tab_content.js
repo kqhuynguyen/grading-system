@@ -18,10 +18,12 @@ function openCity(evt, cityName) {
     document.getElementById(cityName).style.display = "block";
     evt.currentTarget.className += " active";
 }
-function logout()
-{
-  $("#form_login").show(1000);
-  $("#form_submit").hide(2000);
-  $("#pa_result").text('');
-  $("#btn_view_result").hide();
+
+function logout() {
+    $("#form_login").show(1000);
+    $("#password").val('');
+    $("#form_submit").hide(2000);
+    $("#pa_result").text('');
+    $("#btn_view_result").hide();
+    $("#status").text("");
 }

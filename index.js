@@ -23,8 +23,8 @@ exec(exe_file, function(err, data) {
 app.post("/submitfile", multipartMiddleware, function(req, res, next) {
     var file = req.files.file;
     var originalFilename = file.name;
-    var filesType = file.type.split('/')[1];
-    var fileSize = file.size;
+    // var filesType = file.type.split('/')[1];
+    // var fileSize = file.size;
     var pathUpload = __dirname + "/Data/" + originalFilename.split('.')[0] + "/" + originalFilename;
     fs.readFile(file.path, function(err, data) {
         if (!err) {
@@ -60,12 +60,11 @@ io.on("connection", function(socket) {
     });
     socket.on("wait_for_point", function(id) {
         let id_pathfile = __dirname + "/Data/" + id + "/output.txt";
-        let output_fs = require('fs'); // wtf Nhân fs nó require rồi mà
-        output_fs.readFile(id_pathfile, function(err, data) {
+        fs.readFile(id_pathfile, function(err, data) {
             if (err) console.log(err);
             else {
                 socket.emit("get_point", data.toString('utf8'));
-                output_fs.unlink(id_pathfile);
+                fs.unlink(id_pathfile);
             }
         });
     });

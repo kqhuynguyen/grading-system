@@ -12,27 +12,53 @@
     <script>
         var socket = io();
         socket.on("Fail_in_login", function(data) {
-            $("#status").text('Fail in login !');
-            alert("Account name or password is wrong !");
+            $("#status").text('Wrong Username or Password. Retry.');
         });
         socket.on("Success_in_login", function(data) {
-            alert("Login successfully !");
-            $("#status").text('Login successfully !');
+            $("#status").text('');
             $("#form_login").hide(2000);
+            $("#form_signup").hide(2000);
             $("#form_submit").show(1000);
-            $("#nowuser").text('Hello ' + $("#username").val());
+            $("#nowuser").text('Welcome ' + $("#username").val());
         });
         socket.on("get_point", function(data) {
             $("#pa_result").text(data);
         });
         $(document).ready(function() {
-            $("#form_submit").hide();
-            //$("#form_login").hide();
-            $("#btn_view_result").hide();
+            // by default, load form_login first
+            // other forms hide
+            if (0) {
+                $("#form_submit").hide();
+                $("#form_signup").hide();
+                $("#btn_view_result").hide();
+            } else {
+                $("#form_submit").show();
+                $("#form_login").hide();
+                $("#form_signup").hide();
+                $("#btn_view_result").hide();
+            }
+
             $("#btnlogin").click(function() {
                 let data = new Array($("#username").val(), $("#password").val());
                 socket.emit("login", data);
             });
+            // sign up buton, create new account
+            // hide other form except form_signup
+            $("#btnsignup").click(function() {
+                $("#form_submit").hide();
+                $("#form_login").hide();
+                $("#form_signup").show();
+                $("#btn_view_result").hide();
+            });
+            // button sign up and log in
+            // check confirm password
+            // write new data
+            // check data to log in
+            $("#btnSL").click(function() {
+                let data = new Array($("#Susername").val(), $('#Susermail').val, $('#Spassword').val, $("#Scpassword").val());
+                socket.emit("signup", data);
+            });
+            // compiler testing, show result
             $("#view_result").click(function() {
                 socket.emit("wait_for_point", $("#username").val());
             });
@@ -46,7 +72,7 @@
 <body>
     <div class="khunglonbaoquanh" id="form_login">
         <div class="khungtieude">
-            <h1>Log In</h1>
+            <h1>LOG IN</h1>
         </div>
         <div class="divghinhandata">
             <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"></input>
@@ -55,10 +81,36 @@
             <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"></input>
         </div>
         <div class="divghinhandata">
-            <input type="submit" value="Login" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin">
+            <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin">
+        </div>
+        <div class="divghinhandata">
+            <input type="submit" value="Don't have an account. Sign up for once" name="submit" class="buttonsignup" style="text-align:center" id="btnsignup">
         </div>
         <div class="divstatus">
-            <p style="padding-top: 10px" id="status"> Login </p>
+            <p id="status"></p>
+        </div>
+    </div>
+    <div class="khunglonbaoquanh" id="form_signup">
+        <div class="khungtieude">
+            <h1>SIGN UP</h1>
+        </div>
+        <div class="divghinhandata">
+            <input type="text" name="username" id="Susername" placeholder="User Name" class="ghinhandata"></input>
+        </div>
+        <div class="divghinhandata">
+            <input type="text" name="usermail" id="Suseremail" placeholder="Email" class="ghinhandata"></input>
+        </div>
+        <div class="divghinhandata">
+            <input type="password" name="password" id="Spassword" placeholder="Password" class="ghinhandata"></input>
+        </div>
+        <div class="divghinhandata">
+            <input type="password" name="cpassword" id="Scpassword" placeholder="Confirm password" class="ghinhandata"></input>
+        </div>
+        <div class="divghinhandata">
+            <input type="submit" value="Sign up and Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnSL">
+        </div>
+        <div class="divstatus">
+            <p id="status1"></p>
         </div>
     </div>
     <div id="form_submit">
@@ -67,27 +119,27 @@
             <button class="tablinks" onclick="openCity(event, 'Paris')">Points</button>
             <button class="tablinks" onclick="openCity(event, 'Tokyo')">Chat</button>
             <button class="tablinks" onclick="openCity(event, 'Tokyo')">Rank</button>
-            <button style="float:right;color:white;background-color: #2980b9;" onclick="logout()">Log out</button>
+            <button class="Logout" style="float:right;color:white" onclick="logout()">Log out</button>
         </div>
         <div id="London" class="tabcontent">
             <form action="/submitfile" method="post" enctype="multipart/form-data">
                 <div>
-                    <h3 id="nowuser"></h3>
+                    <h4 style="font-family:'Leelawadee UI';" id="nowuser"></h4>
                 </div>
                 <div class="side_submit">
-                    <div style="text-align:center;background-color:#68228B;color:white">
+                    <div>
                         <h3> Assignment</h3>
                     </div>
                     <div style="text-align:left;font-size:14px">
                         <p><b><u>Đề bài:</u><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
                     </div>
                     <div>
-                        <input type="file" id="file" name="file"></input>
-                        <input type="submit" id="send_file"></input>
+                        <input type="file" id="file1" name="file1" style="content:'Main file'"></input><br>
+                        <input class="subpro" type="submit" id="send_file" onclick=""></input>
                     </div>
                 </div>
                 <div class="side_result">
-                    <div style="text-align:center;background-color:#68228B;color:white">
+                    <div>
                         <h3>Result</h3>
                     </div>
                     <div style="text-align:left;font-size:14px">

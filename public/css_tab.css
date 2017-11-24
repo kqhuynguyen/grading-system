@@ -1,11 +1,6 @@
-body {
-    font-family: "Leelawadee UI";
-}
-
 div.tab {
     overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
+    background-color: #2980b9;
 }
 
 
@@ -13,6 +8,7 @@ div.tab {
 
 div.tab button {
     background-color: inherit;
+    font-family: "Leelawadee UI";
     float: left;
     border: none;
     outline: none;
@@ -26,8 +22,12 @@ div.tab button {
 
 /* Change background color of buttons on hover */
 
-div.tab button:hover {
+.tablinks:hover {
     background-color: #ddd;
+}
+
+.Logout:hover {
+    background-color: #0b92f4;
 }
 
 
@@ -57,14 +57,12 @@ div.tab button.active {
     height: 480px;
     width: 50%;
     float: left;
-    background-color: #C6E2FF
 }
 
 .side_result {
     height: 480px;
     width: 50%;
     float: right;
-    background-color: #FFC0CB
 }
 
 @-webkit-keyframes fadeEffect {
@@ -83,4 +81,23 @@ div.tab button.active {
     to {
         opacity: 1;
     }
+}
+
+h3 {
+    font-family: "Leelawadee UI";
+    font-size: 30px;
+    color: #1c1c1c;
+}
+
+.subpro {
+    width: 15%;
+    height: 30px;
+    background-color: #2980b9;
+    color: white;
+    border-radius: 4px;
+    border: none;
+    margin-left: 2%;
+    margin-top: 2%;
+    font-family: "Leelawadee UI";
+    font-size: 12pt;
 }
