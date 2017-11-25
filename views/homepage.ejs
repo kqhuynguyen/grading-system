@@ -37,10 +37,17 @@
         socket.on("get_point", function (data) {
             $("#pa_result").text(data);
         });
+<<<<<<< HEAD
         socket.on("Exist this account", function (data) {
             alert('This account is existence !');
         });
         socket.on("signup_successfully", function (data) {
+=======
+        socket.on("Exist this account", function(data) {
+            alert('This account is existence !');
+        });
+        socket.on("signup_successfully", function(data) {
+>>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
             alert('Sign up successfully !');
             $("#form_signup").hide(2000);
             $("#form_submit").show(1000);
@@ -48,6 +55,7 @@
         $(document).ready(function () {
             // by default, load form_login first
             // other forms hide
+<<<<<<< HEAD
             if (0) {
                 $("#form_signup").hide();
                 $("#btn_view_result").hide();
@@ -56,7 +64,20 @@
                 $("#form_login").show();
                 $("#form_signup").hide();
                 $("#btn_view_result").hide();
+=======
+            if ($("#username").val() == '') {
+>>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
                 $("#form_submit").hide();
+                if (0) {
+                    $("#form_signup").hide();
+                    $("#btn_view_result").hide();
+                } else {
+                    //  $("#form_submit").show();
+                    $("#form_login").show();
+                    $("#form_signup").hide();
+                    $("#btn_view_result").hide();
+                    $("#form_submit").hide();
+                }
             }
 
             $("#btnlogin").click(function () {
@@ -74,16 +95,31 @@
                 $("#form_signup").show();
                 $("#btn_view_result").hide();
             });
+            // back to log in buton
+            $("#btnlogback").click(function() {
+                $("#form_submit").hide();
+                $("#form_login").show();
+                $("#form_signup").hide();
+                $("#btn_view_result").hide();
+            });
             // button sign up and log in
             // check confirm password
             // write new data
             // check data to log in
+<<<<<<< HEAD
             $("#btnSL").click(function () {
                 if ($('#Spassword').val() != $("#Scpassword").val())
                     alert('Wrong Confirm Password !');
                 else {
                     let data = new Array($("#Susername").val(), $('#Suseremail').val(), $('#Spassword')
                         .val(), $("#Scpassword").val());
+=======
+            $("#btnSL").click(function() {
+                if ($('#Spassword').val() != $("#Scpassword").val())
+                    alert('Wrong Confirm Password !');
+                else {
+                    let data = new Array($("#Susername").val(), $('#Suseremail').val(), $('#Spassword').val(), $("#Scpassword").val());
+>>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
                     socket.emit("signup", data);
                 }
             });
@@ -104,17 +140,21 @@
             <h1>LOG IN</h1>
         </div>
         <div class="divghinhandata">
-            <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"></input>
+            <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"/>
         </div>
         <div class="divghinhandata">
-            <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"></input>
+            <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"/>
         </div>
         <div class="divghinhandata">
-            <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin">
+            <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin"/>
         </div>
         <div class="divghinhandata">
+<<<<<<< HEAD
             <input type="submit" value="Don't have an account. Sign up for once" name="submit" class="buttonsignup" style="text-align:center"
                 id="btnsignup">
+=======
+            <input type="submit" value="Don't have an account. Sign up for once" name="submit" class="buttonsignup" style="text-align:center" id="btnsignup"/>
+>>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
         </div>
         <div class="divstatus">
             <p id="status"></p>
@@ -125,19 +165,22 @@
             <h1>SIGN UP</h1>
         </div>
         <div class="divghinhandata">
-            <input type="text" name="username" id="Susername" placeholder="User Name" class="ghinhandata"></input>
+            <input type="text" name="username" id="Susername" placeholder="User Name" class="ghinhandata"/>
         </div>
         <div class="divghinhandata">
-            <input type="text" name="usermail" id="Suseremail" placeholder="Email" class="ghinhandata"></input>
+            <input type="text" name="usermail" id="Suseremail" placeholder="Email" class="ghinhandata"/>
         </div>
         <div class="divghinhandata">
-            <input type="password" name="password" id="Spassword" placeholder="Password" class="ghinhandata"></input>
+            <input type="password" name="password" id="Spassword" placeholder="Password" class="ghinhandata"/>
         </div>
         <div class="divghinhandata">
-            <input type="password" name="cpassword" id="Scpassword" placeholder="Confirm password" class="ghinhandata"></input>
+            <input type="password" name="cpassword" id="Scpassword" placeholder="Confirm password" class="ghinhandata"/>
         </div>
         <div class="divghinhandata">
-            <input type="submit" value="Sign up and Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnSL">
+            <input type="submit" value="Sign up and Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnSL"/>
+        </div>
+        <div class="divghinhandata">
+            <input type="submit" value="Already have an account. Log in." name="submit" class="buttonsignup" style="text-align:center" id="btnlogback"/>
         </div>
         <div class="divstatus">
             <p id="status1"></p>
@@ -156,8 +199,9 @@
                 <div>
                     <h4 style="font-family:'Leelawadee UI';" id="nowuser"></h4>
                 </div>
-                <div class="side_submit">
+                <div class="head_topic">
                     <div>
+<<<<<<< HEAD
                         <h3> Assignment</h3>
                     </div>
                     <div style="text-align:left;font-size:14px">
@@ -173,11 +217,23 @@
                         <input type="file" id="file1" name="file1" style="content:'Main file'"></input>
                         <br>
                         <input class="subpro" type="submit" id="send_file" onclick=""></input>
+=======
+                        <h3> Topic</h3>
                     </div>
+                    <div>
+                        <p><b><u>Đề bài:</u><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
+>>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
+                    </div>
+                </div>
+                <div class="side_submit">
+                    <label class = "fileContainer">Choose file
+                    <input type="file" id="file1" name="file1" style="content:'Main file'" /><br>
+                    </label>
+                    <input class="subpro" type="submit" id="send_file" onclick="" />
                 </div>
                 <div class="side_result">
                     <div>
-                        <h3>Result</h3>
+                        <h4>Result</h4>
                     </div>
                     <div style="text-align:left;font-size:14px">
                         <p id="pa_result">
