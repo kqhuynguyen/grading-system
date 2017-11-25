@@ -37,17 +37,10 @@
         socket.on("get_point", function (data) {
             $("#pa_result").text(data);
         });
-<<<<<<< HEAD
-        socket.on("Exist this account", function (data) {
-            alert('This account is existence !');
-        });
-        socket.on("signup_successfully", function (data) {
-=======
         socket.on("Exist this account", function(data) {
             alert('This account is existence !');
         });
         socket.on("signup_successfully", function(data) {
->>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
             alert('Sign up successfully !');
             $("#form_signup").hide(2000);
             $("#form_submit").show(1000);
@@ -55,18 +48,7 @@
         $(document).ready(function () {
             // by default, load form_login first
             // other forms hide
-<<<<<<< HEAD
-            if (0) {
-                $("#form_signup").hide();
-                $("#btn_view_result").hide();
-            } else {
-                //  $("#form_submit").show();
-                $("#form_login").show();
-                $("#form_signup").hide();
-                $("#btn_view_result").hide();
-=======
             if ($("#username").val() == '') {
->>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
                 $("#form_submit").hide();
                 if (0) {
                     $("#form_signup").hide();
@@ -106,20 +88,11 @@
             // check confirm password
             // write new data
             // check data to log in
-<<<<<<< HEAD
-            $("#btnSL").click(function () {
-                if ($('#Spassword').val() != $("#Scpassword").val())
-                    alert('Wrong Confirm Password !');
-                else {
-                    let data = new Array($("#Susername").val(), $('#Suseremail').val(), $('#Spassword')
-                        .val(), $("#Scpassword").val());
-=======
             $("#btnSL").click(function() {
                 if ($('#Spassword').val() != $("#Scpassword").val())
                     alert('Wrong Confirm Password !');
                 else {
                     let data = new Array($("#Susername").val(), $('#Suseremail').val(), $('#Spassword').val(), $("#Scpassword").val());
->>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
                     socket.emit("signup", data);
                 }
             });
@@ -149,12 +122,7 @@
             <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin"/>
         </div>
         <div class="divghinhandata">
-<<<<<<< HEAD
-            <input type="submit" value="Don't have an account. Sign up for once" name="submit" class="buttonsignup" style="text-align:center"
-                id="btnsignup">
-=======
             <input type="submit" value="Don't have an account. Sign up for once" name="submit" class="buttonsignup" style="text-align:center" id="btnsignup"/>
->>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
         </div>
         <div class="divstatus">
             <p id="status"></p>
@@ -201,28 +169,10 @@
                 </div>
                 <div class="head_topic">
                     <div>
-<<<<<<< HEAD
-                        <h3> Assignment</h3>
-                    </div>
-                    <div style="text-align:left;font-size:14px">
-                        <p>
-                            <b>
-                                <u>Đề bài:</u>
-                                <i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của
-                                    dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i>
-                            </b>
-                        </p>
-                    </div>
-                    <div>
-                        <input type="file" id="file1" name="file1" style="content:'Main file'"></input>
-                        <br>
-                        <input class="subpro" type="submit" id="send_file" onclick=""></input>
-=======
                         <h3> Topic</h3>
                     </div>
                     <div>
                         <p><b><u>Đề bài:</u><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
->>>>>>> 8ec1a13b9831428ddf2c258efd16c12dc057c381
                     </div>
                 </div>
                 <div class="side_submit">
