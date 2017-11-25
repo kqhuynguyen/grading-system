@@ -1,29 +1,29 @@
 module.exports = {
-    compile_cpp_file: function(id, after_compile) {
-        let child_process = require('child_process');
-        let source_cpp = __dirname + '/Data/execute_exe/';
-        let exe_name = id;
+    compileCppFile: function(id, afterCompile) {
+        let childProcess = require('child_process');
+        let sourceCpp = __dirname + '/Data/execute_exe/';
+        let exeName = id;
         let execute;
-        child_process.execFile('g++', [source_cpp + exe_name + '.cpp', '-o', exe_name], (error, stdout, stderr) => {
+        childProcess.execFile('g++', [sourceCpp + exeName + '.cpp', '-o', exeName], (error, stdout, stderr) => {
             if (error) {
                 console.log(error);
             }
             console.log(stdout);
             setTimeout(function() {
-                child_process.exec('taskkill /F /IM ' + exe_name + '.exe', { cwd: source_cpp }, function(err, stdout, stderr) {
+                childProcess.exec('taskkill /F /IM ' + exeName + '.exe', { cwd: sourceCpp }, function(err, stdout, stderr) {
                     if (err) console.log(err);
                     let fs = require('fs');
                     let path = __dirname + '/Data/execute_exe/output.txt';
                     if (fs.existsSync(path)) {
-                        move_file.moveFile(path, __dirname + '/Data/' + exe_name + '/output.txt', function() {});
+                        moveFile.moveFile(path, __dirname + '/Data/' + exeName + '/output.txt', function() {});
                     }
-                    after_compile();
+                    afterCompile();
                 });
             }, 3000);
-            let move_file = require('./copymove.js');
-            console.log(exe_name);
-            move_file.moveFile(__dirname + '/' + exe_name + '.exe', __dirname + '/Data/execute_exe/' + exe_name + '.exe', function() {
-                execute = child_process.exec(exe_name + '.exe', { cwd: source_cpp }, (error, stdout, stderr) => {
+            let moveFile = require('./copymove.js');
+            console.log(exeName);
+            moveFile.moveFile(__dirname + '/' + exeName + '.exe', __dirname + '/Data/execute_exe/' + exeName + '.exe', function() {
+                execute = childProcess.exec(exeName + '.exe', { cwd: sourceCpp }, (error, stdout, stderr) => {
                     if (error) {
                         console.log(error);
                     }

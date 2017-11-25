@@ -1,22 +1,21 @@
-function return_timesubmit(times_submit){
-  return times_submit;
+function return_timesubmit(timesSubmit) {
+    return timesSubmit;
 }
-function get_timessubmit_of_student(username,onsuccess)
-{
-  let line_reader=require('line-reader');
-  let file_data=__dirname+"/DataStudent/Danhsachsinhvien.csv";
-  line_reader.eachLine(file_data,function(line,last)
-  {
-      let seperate=line.split(',');
-      if(seperate[0]==username) onsuccess(seperate[2]);
-  });
+
+function getTimesSubmitOfStudent(username, onsuccess) {
+    let lineReader = require('line-reader');
+    let fileData = __dirname + "/DataStudent/Danhsachsinhvien.csv";
+    lineReader.eachLine(fileData, function (line, last) {
+        let seperate = line.split(',');
+        if (seperate[0] == username) onsuccess(seperate[2]);
+    });
 }
 module.exports = {
-    check_login_csv: function(username, password) {
+    checkLoginCSV: function (username, password) {
         return new Promise((resolve, reject) => {
-            let line_reader = require('line-reader');
-            let file_data = __dirname + "/DataStudent/Account.csv";
-            line_reader.eachLine(file_data, function(line, last) {
+            let lineReader = require('line-reader');
+            let fileData = __dirname + "/DataStudent/Account.csv";
+            lineReader.eachLine(fileData, function (line, last) {
                 if (line.split(',')[0] == username) {
                     if (line.split(',')[1] == password) {
                         return resolve(line);
@@ -32,38 +31,37 @@ module.exports = {
             });
         });
     },
-    wait_for_second: function(ms, after_wait) {
+    waitForSecond: function (ms, afterWait) {
         let start = new Date().getTime();
         let end = start;
         while (end < start + ms) {
             end = new Date().getTime();
         }
-        after_wait();
+        afterWait();
     },
-    Get_timessubmit_of_student:function(username,onsuccess){
-    get_timessubmit_of_student(username,function(times_submit){
-      onsuccess(times_submit);
+    getTimesSubmitOfStudent: function (username, onsuccess) {
+        getTimesSubmitOfStudent(username, function (times_submit) {
+            onsuccess(times_submit);
         });
     },
-    add_new_account: function(data){
-      let append=require('fs');
-      console.log('in function '+data);
-      let account_source=__dirname+'/DataStudent/Account.csv';
-      append.appendFile(account_source,data,function(err,success){
-        if(err) console.log(err);
-      });
-   },
-   check_account_existence:function(data,exist){
-     let line_reader=require('line-reader');
-     let file_data=__dirname+"/DataStudent/Account.csv";
-     line_reader.eachLine(file_data,function(line,last)
-     {
-         let seperate=line.split(',');
-         if(seperate[0]==data) exist(seperate[0]);
-         if(last) {
-           if(seperate[0]==data) exist(seperate[0]);
-           else exist(null);
-         }
-     });
-   }
+    addNewAccount: function (data) {
+        let append = require('fs');
+        console.log('in function ' + data);
+        let account_source = __dirname + '/DataStudent/Account.csv';
+        append.appendFile(account_source, data, function (err, success) {
+            if (err) console.log(err);
+        });
+    },
+    checkAccountExistence: function (data, exist) {
+        let line_reader = require('line-reader');
+        let file_data = __dirname + "/DataStudent/Account.csv";
+        line_reader.eachLine(file_data, function (line, last) {
+            let seperate = line.split(',');
+            if (seperate[0] == data) exist(seperate[0]);
+            if (last) {
+                if (seperate[0] == data) exist(seperate[0]);
+                else exist(null);
+            }
+        });
+    }
 }
