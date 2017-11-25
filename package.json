@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "async-limiter": "^1.0.0",
     "body-parser": "^1.18.2",
     "child_process": "^1.0.2",
     "connect-multiparty": "^2.0.0",
