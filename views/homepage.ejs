@@ -27,7 +27,7 @@
         $(document).ready(function() {
             // by default, load form_login first
             // other forms hide
-            if (0) {
+            if ($("#username").val() == '') {
                 $("#form_submit").hide();
                 $("#form_signup").hide();
                 $("#btn_view_result").hide();
@@ -48,6 +48,13 @@
                 $("#form_submit").hide();
                 $("#form_login").hide();
                 $("#form_signup").show();
+                $("#btn_view_result").hide();
+            });
+            // back to log in buton
+            $("#btnlogback").click(function() {
+                $("#form_submit").hide();
+                $("#form_login").show();
+                $("#form_signup").hide();
                 $("#btn_view_result").hide();
             });
             // button sign up and log in
@@ -108,6 +115,9 @@
         </div>
         <div class="divghinhandata">
             <input type="submit" value="Sign up and Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnSL">
+        </div>
+        <div class="divghinhandata">
+            <input type="submit" value="Already have an account. Log in." name="submit" class="buttonsignup" style="text-align:center" id="btnlogback">
         </div>
         <div class="divstatus">
             <p id="status1"></p>
