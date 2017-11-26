@@ -2,9 +2,10 @@
 <html>
 
 <head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&amp;subset=vietnamese" rel="stylesheet">        
     <link rel="stylesheet" href="css_login.css">
     <link rel="stylesheet" href="css_tab.css">
-    <meta charset="utf-8" />
     <title>Login Page</title>
     <script src="jquery.js"></script>
     <script src="socket.io/socket.io.js"></script>
@@ -19,8 +20,7 @@
         });
         // login succeeded. Set cookies if needed
         socket.on("login_success", function (data) {
-            Cookies.set('token', data.token, { expires: 3 });
-            Cookies.set('sid', data.sid, { expires: 3 });
+            Cookies.set('auth', data, { expires: 3 });
             $("#status").text('');
             $("#form_login").hide(2000);
             $("#form_signup").hide(2000);
@@ -32,7 +32,7 @@
             $("#form_login").hide(0);
             $("#form_signup").hide(0);
             $("#form_submit").show(0);
-            $("#nowuser").text('Welcome ' + $("#username").val());
+            $("#nowuser").text('Welcome ' + data.username);
         });
         socket.on("get_point", function (data) {
             $("#pa_result").text(data);
@@ -110,7 +110,7 @@
 <body>
     <div class="khunglonbaoquanh" id="form_login">
         <div class="khungtieude">
-            <h1>LOG IN</h1>
+            <div class='login-heading'>LOGIN</div>
         </div>
         <div class="divghinhandata">
             <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"/>

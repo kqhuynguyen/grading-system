@@ -1,23 +1,30 @@
-    body {
-        background: url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) repeat-x center center fixed;
-        background-size: 100%;
-        -webkit-background-size: 100%;
-        -moz-background-size: 100%;
-        -o-background-size: 100%;
+    html {
+        background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.5)), to(rgba(0, 0, 0, 0.5))), url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) no-repeat center center fixed;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) no-repeat center center fixed;
+        background-size: cover;
     }
     
     h1,
     p {
         font-family: "Leelawadee UI";
     }
-    
-    .khungtieude {
-        font-weight: 200;
-        padding-top: 2%;
-        height: 30%;
-        width: 100%;
+    .login-heading {
+        font-weight: 300;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: 250%;
+        position: relative;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+                transform: translateY(-50%);
         text-align: center;
         color: #1c1c1c;
+        font-family: 'Roboto';
+    }
+
+    .khungtieude {
+        height: 30%;
+        width: 100%;
     }
     
     .khunglonbaoquanh {
@@ -27,7 +34,8 @@
         width: 30%;
         height: 400px;
         background-color: #ffffff;
-        box-shadow: 5px 5px 5px #555555;
+        -webkit-box-shadow: 5px 5px 5px #555555;
+                box-shadow: 5px 5px 5px #555555;
     }
     
     .ghinhandata {

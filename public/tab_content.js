@@ -21,8 +21,7 @@ function openCity(evt, cityName) {
 
 function logout() {
     let socket = io();
-    Cookies.remove('sid');
-    Cookies.remove('token');
+    Cookies.remove('auth');
     socket.emit("logout");
     $("#form_login").show(1000);
     $("#password").val('');

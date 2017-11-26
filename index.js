@@ -70,13 +70,17 @@ server.listen(port, () => {
 
 io.on("connection", function (socket) {
     console.log("Connection found: " + socket.id);
+    
     if (socket.handshake.headers.cookie) {
         let cookies = cookie.parse(socket.handshake.headers.cookie);
-        if (cookies['sid']) {
-            jwt.verify(cookies['token'], jwtSecret, (err, decoded) => {
+        // check if the token exists in the cookie
+        if (cookies['auth']) {
+            // verify that is it a valid token
+            jwt.verify(cookies['auth'], jwtSecret, (err, decoded) => {
                 if (err) {
                     return console.log(err);
                 }
+                // tell the user that they are already authenticated
                 socket.emit("already_authenticated", {
                     username: decoded.username
                 });
@@ -87,25 +91,22 @@ io.on("connection", function (socket) {
     socket.on("login", function (data) {
         dataobj.checkLoginCSV(data.username, data.password)
             .then(result => {
+                let session = socket.request.session;
+                // get the session's id
+                let sid = session.id;
                 // store the username in the session
                 let payload = {
-                    username: data.username
+                    username: data.username,
                 }
                 // sign jwt token asynchronously
                 jwt.sign(payload, jwtSecret, (err, token) => {
-                    let session = socket.request.session;
-                    let sid = session.id;
                     // regenerate the session
                     session.regenerate((err) => {
                         console.log(err);
                         // store the session id and the token in the session store
-                        let data = {
-                            sid,
-                            token
-                        };
                         sessionStore.set(sid, token, (err) => {
                             if (err) return console.log(err);
-                            socket.emit('login_success', data)
+                            socket.emit('login_success', token)
                         });
                     });
 
