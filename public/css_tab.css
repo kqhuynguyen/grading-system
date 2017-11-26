@@ -69,7 +69,7 @@ div.tab button.active {
     position: relative;
 }
 
-.fileContainer [type=file] {
+.fileContainer [file]{
     cursor: pointer;
     font-family: "Leelawadee UI";
     display: block;

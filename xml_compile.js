@@ -24,18 +24,22 @@ module.exports = {
           cwd: sourceCpp
         }, (error, stdout, stderr) => {
           if (error) {
-            console.log(error);
+            onsuccess(error,null);
           }
-          console.log(stdout);
+          else{console.log(stdout);
           console.log("Read xml file successfully !");
-          onsuccess();
+          onsuccess(null,'1')
+            }
         });
       });
     });
   },
   runExeFile: function (id, times_submit, onsuccess) {
-    let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/';
+    let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/';
     let childProcess = require('child_process');
+    //setTimeout(function(){
+
+  //  },3000);
     childProcess.exec(id + '.exe', {
       cwd: sourceCpp
     }, (error, stdout, stderr) => {
@@ -47,3 +51,21 @@ module.exports = {
     });
   }
 }
+let ps = require('ps-node');
+
+// A simple pid lookup
+ps.lookup({ name:'svhosijijt.exe' }, function(err, resultList ) {
+    if (err) {
+        throw new Error( err );
+    }
+
+    let process = resultList[ 0 ];
+
+    if( process ){
+
+        console.log( 'PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
+    }
+    else {
+        console.log( 'No such process found!' );
+    }
+});

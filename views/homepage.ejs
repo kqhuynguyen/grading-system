@@ -12,7 +12,7 @@
     <script src="tab_content.js"></script>
     <script>
         var socket = io();
-        
+
         // login failed
         socket.on("login_fail", function (data) {
             $("#status").text('Wrong Username or Password. Retry.');
@@ -176,9 +176,7 @@
                     </div>
                 </div>
                 <div class="side_submit">
-                    <label class = "fileContainer">Choose file
-                    <input type="file" id="file1" name="file1" style="content:'Main file'" /><br>
-                    </label>
+                    <input type="file" id="file" name="file" style="content:'Main file'"></input><br>
                     <input class="subpro" type="submit" id="send_file" onclick="" />
                 </div>
                 <div class="side_result">
