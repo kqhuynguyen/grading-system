@@ -70,17 +70,20 @@ server.listen(port, () => {
 
 io.on("connection", function (socket) {
     console.log("Connection found: " + socket.id);
-    let cookies = cookie.parse(socket.handshake.headers.cookie);
-    if (cookies['sid']) {
-        jwt.verify(cookies['token'], jwtSecret, (err, decoded) => {
-            if (err) {
-                return console.log(err);
-            }
-            socket.emit("already_authenticated", {
-                username: decoded.username
-            }); 
-        });
+    if (socket.handshake.headers.cookie) {
+        let cookies = cookie.parse(socket.handshake.headers.cookie);
+        if (cookies['sid']) {
+            jwt.verify(cookies['token'], jwtSecret, (err, decoded) => {
+                if (err) {
+                    return console.log(err);
+                }
+                socket.emit("already_authenticated", {
+                    username: decoded.username
+                }); 
+            });
+        }
     }
+
     socket.on("login", function (data) {
         dataobj.checkLoginCSV(data.username, data.password)
             .then(result => {
@@ -90,17 +93,16 @@ io.on("connection", function (socket) {
                 }
                 // sign jwt token asynchronously
                 jwt.sign(payload, jwtSecret, (err, token) => {
-                    let sid = socket.request.session.id;
+                    let session = socket.request.session;
+                    let sid = session.id;
                     // store the session id and the token in the session store
+                    let data = {
+                        sid,
+                        token
+                    };
                     sessionStore.set(sid, token, (err) => {
-                        if (err) {
-                            return console.log(err);
-                        }
-                        // send back the token to the client
-                        socket.emit("login_success", {
-                            sid,
-                            token
-                        });
+                        if (err) return console.log(err);
+                        socket.emit('login_success', data)                        
                     });
                 });
             }, error => {
@@ -131,6 +133,7 @@ io.on("connection", function (socket) {
         });
     });
     socket.on("logout", function(data) {
-        console.log('shit');
+        socket.request.session.destroy();
+        console.log('logged out');
     })
 });
