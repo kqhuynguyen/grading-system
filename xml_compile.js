@@ -34,38 +34,28 @@ module.exports = {
       });
     });
   },
-  runExeFile: function (id, times_submit, onsuccess) {
+  runExeFile: function (id, times_submit,inflow,outflow,onsuccess) {
     let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/';
     let childProcess = require('child_process');
-    //setTimeout(function(){
-
-  //  },3000);
-    childProcess.exec(id + '.exe', {
+    setTimeout(function(){
+    let newprocess=require('child_process');
+    newprocess.exec('taskkill /F /IM '+id+'.exe',{cwd:sourceCpp},function(error,stdout,stderr){
+          if(error) console.log('Run file successfully !');
+          else {
+            let typeFault='Stack overflow !';
+            onsuccess(typeFault,null);
+          }
+       });
+    },3000);
+    childProcess.exec(id + '.exe'+' <'+inflow+'>'+' '+outflow, {
       cwd: sourceCpp
     }, (error, stdout, stderr) => {
       if (error) {
         console.log(error);
       }
       console.log(stdout);
-      onsuccess();
+      onsuccess(null,'1');
     });
   }
 }
 let ps = require('ps-node');
-
-// A simple pid lookup
-ps.lookup({ name:'svhosijijt.exe' }, function(err, resultList ) {
-    if (err) {
-        throw new Error( err );
-    }
-
-    let process = resultList[ 0 ];
-
-    if( process ){
-
-        console.log( 'PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
-    }
-    else {
-        console.log( 'No such process found!' );
-    }
-});

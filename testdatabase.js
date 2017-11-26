@@ -101,12 +101,29 @@ module.exports = {
                       let fs=require('fs');
                       let buildFolder='./Data/'+id+'/submit'+now_submit+'/build';
                       fs.mkdirSync(buildFolder);
+                      let sourceCreatetestcase='./public/';
+                      rename.copyFile(sourceCreatetestcase+'createtestcase.exe',buildFolder,function(){
+                         rename.copyFile(sourceCreatetestcase+'libstdc++-6.dll',buildFolder,function(){
+                            let createtestcase=require('child_process');
+                            createtestcase.exec('createtestcase.exe',{cwd:buildFolder},function(err,stdout,stderr){
+                               if(err) console.log(err);
+                               else console.log(stdout);
+                             });
+                          });
+                      });
                       let xmlCompile=require('./xml_compile.js');
                       xmlCompile.readXmlAndCompile(id,now_submit,function(error,success){
                         if(error) {result(error,null);fs.unlinkSync(newfolder+'/'+id+'.exe');}
                         else{rename.moveFile(newfolder+'/'+id+'.exe',newfolder+'/build/'+id+'.exe',function(){
-                             xmlCompile.runExeFile(id,now_submit,function(){
-
+                              xmlCompile.runExeFile(id,now_submit,'input1.txt','output1.txt',function(err,success){
+                                if(err){
+                                  result(err,null);
+                                }
+                                else {
+                                  xmlCompile.runExeFile(id,now_submit,'input2.txt','output2.txt',function(err1,success1){
+                                    if(err1) result(err1,null);
+                                  });
+                                }
                             });
                           });
                         }

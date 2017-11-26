@@ -48,7 +48,7 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
             fs.writeFile(pathUpload, data, function () {
               let db=require('./testdatabase.js');
               db.unzipFileSubmit(originalFilename.split('.')[0],function(err,suc){
-              if(err) console.log('Loi compiler: '+err);
+              if(err) console.log('Fault: '+err);
               });
             });
         } else console.log(err);
