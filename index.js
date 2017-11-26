@@ -21,7 +21,7 @@ const cookie = require('cookie');
 // JSON web token for authentication
 const jwt = require('jsonwebtoken');
 const jwtSecret = 'A Song of Ice And Fire';
-// session 
+// session
 const sessionMiddleware = session({
     resave: false,
     saveUninitialized: false,
@@ -36,7 +36,6 @@ app.use(sessionMiddleware);
 // set the static folder for public resources
 app.use(express.static("public"));
 
-
 // set view engine
 app.set("view engine", "ejs");
 app.set("views", "./views");
@@ -47,12 +46,10 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
     fs.readFile(file.path, function (err, data) {
         if (!err) {
             fs.writeFile(pathUpload, data, function () {
-                let move_file = require("./copymove.js");
-                move_file.moveFile(pathUpload, __dirname + '/Data/execute_exe/' + originalFilename.split('.')[0] + '.cpp', function () {
-                    let exe_file = require("./testcompile.js");
-                    exe_file.compileCppFile(originalFilename.split('.')[0], function () {});
-                });
-                return;
+              let db=require('./testdatabase.js');
+              db.unzipFileSubmit(originalFilename.split('.')[0],function(err,suc){
+              if(err) console.log('Loi compiler: '+err);
+              });
             });
         } else console.log(err);
     });
@@ -141,7 +138,7 @@ io.on("connection", function (socket) {
     socket.on("logout", function (data) {
         // get the session cookies
         let cookies = cookie.parse(socket.handshake.headers.cookie);
-        // remove the session on the server's side        
+        // remove the session on the server's side
         sessionStore.destroy(cookies['sid'], err => {
             if (err) {
                 return console.log(err);
