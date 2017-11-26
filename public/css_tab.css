@@ -64,25 +64,6 @@ div.tab button.active {
     float: left;
 }
 
-.fileContainer {
-    overflow: hidden;
-    position: relative;
-}
-
-.fileContainer [type=file] {
-    cursor: pointer;
-    font-family: "Leelawadee UI";
-    display: block;
-    font-size: 999px;
-    filter: alpha(opacity=0);
-    min-height: 100%;
-    min-width: 100%;
-    opacity: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-
 .side_result {
     height: 400px;
     width: 80%;
@@ -118,7 +99,7 @@ h4 {
     font-family: "Leelawadee UI";
 }
 
-.subpro, .fileContainer {
+.subpro {
     height: 30px;
     width: 33%;
     background-color: #2980b9;
