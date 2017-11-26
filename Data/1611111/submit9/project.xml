@@ -1,0 +1,5 @@
+<project>
+  <header_files>fileheader.h</header_files>
+  <source_files>filesource.cpp</source_files>
+  <main>main.cpp</main>
+</project>

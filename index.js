@@ -10,8 +10,33 @@ const server = require('http').createServer(app);
 // socket io initialization
 const io = require('socket.io')(server);
 const port = process.env.PORT || 3000;
+// session for login
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+const sessionStore = new FileStore({
+    secret: 'Glory to the State'
+});
+// cookie parser
+const cookie = require('cookie');
+// JSON web token for authentication
+const jwt = require('jsonwebtoken');
+const jwtSecret = 'A Song of Ice And Fire';
+// session
+const sessionMiddleware = session({
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    secret: 'Glory to the State'
+});
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, socket.request.res, next);
+})
+app.use(sessionMiddleware);
+
 // set the static folder for public resources
 app.use(express.static("public"));
+
+// set view engine
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.post("/submitfile", multipartMiddleware, function (req, res, next) {
@@ -21,18 +46,17 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
     fs.readFile(file.path, function (err, data) {
         if (!err) {
             fs.writeFile(pathUpload, data, function () {
-                let move_file = require("./copymove.js");
-                move_file.moveFile(pathUpload, __dirname + '/Data/execute_exe/' + originalFilename.split('.')[0] + '.cpp', function () {
-                    let exe_file = require("./testcompile.js");
-                    exe_file.compileCppFile(originalFilename.split('.')[0], function () {});
-                });
-                return;
+              let db=require('./testdatabase.js');
+              db.unzipFileSubmit(originalFilename.split('.')[0],function(err,suc){
+              if(err) console.log('Loi compiler: '+err);
+              });
             });
         } else console.log(err);
     });
 });
 app.get("/", function (req, res) {
     res.render("homepage");
+    // if an user is available in the session
 });
 
 // start the server
@@ -42,13 +66,49 @@ server.listen(port, () => {
 
 
 io.on("connection", function (socket) {
-    console.log("Connected found: " + socket.id);
+    console.log("Connection found: " + socket.id);
+    if (socket.handshake.headers.cookie) {
+        let cookies = cookie.parse(socket.handshake.headers.cookie);
+        if (cookies['sid']) {
+            jwt.verify(cookies['token'], jwtSecret, (err, decoded) => {
+                if (err) {
+                    return console.log(err);
+                }
+                socket.emit("already_authenticated", {
+                    username: decoded.username
+                });
+            });
+        }
+    }
+
     socket.on("login", function (data) {
-        dataobj.checkLoginCSV(data[0], data[1])
+        dataobj.checkLoginCSV(data.username, data.password)
             .then(result => {
-                socket.emit("Success_in_login", "Success_in_login");
+                // store the username in the session
+                let payload = {
+                    username: data.username
+                }
+                // sign jwt token asynchronously
+                jwt.sign(payload, jwtSecret, (err, token) => {
+                    let session = socket.request.session;
+                    let sid = session.id;
+                    // regenerate the session
+                    session.regenerate((err) => {
+                        console.log(err);
+                        // store the session id and the token in the session store
+                        let data = {
+                            sid,
+                            token
+                        };
+                        sessionStore.set(sid, token, (err) => {
+                            if (err) return console.log(err);
+                            socket.emit('login_success', data)
+                        });
+                    });
+
+                });
             }, error => {
-                socket.emit("Fail_in_login", "Fail_in_login");
+                socket.emit("login_fail", "login_fail");
                 console.log(error);
             });
     });
@@ -63,15 +123,28 @@ io.on("connection", function (socket) {
         });
     });
     socket.on("signup", function (data) {
-        let add_new_line = require('./testdatabase.js');
-        add_new_line.checkAccountExistence(data[0], function (exist) {
+        let addNewLine = require('./testdatabase.js');
+        addNewLine.checkAccountExistence(data[0], function (exist) {
             console.log(exist);
             if (exist) socket.emit('Exist this account', data[0]);
             else {
                 let new_line_account = data[0] + ',' + data[2] + ',' + data[1] + '\r\n';
-                add_new_line.addNewAccount(new_line_account);
+                addNewLine.addNewAccount(new_line_account);
                 socket.emit("signup_successfully", data[0])
             }
         });
     });
+    socket.on("logout", function (data) {
+        // get the session cookies
+        let cookies = cookie.parse(socket.handshake.headers.cookie);
+        // remove the session on the server's side
+        sessionStore.destroy(cookies['sid'], err => {
+            if (err) {
+                return console.log(err);
+            }
+            // destroy the session on the client's side
+            socket.request.session.destroy();
+            console.log('logged out');
+        });
+    })
 });

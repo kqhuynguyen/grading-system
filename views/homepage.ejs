@@ -8,17 +8,34 @@
     <title>Login Page</title>
     <script src="jquery.js"></script>
     <script src="socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="tab_content.js"></script>
     <script>
         var socket = io();
-        socket.on("Fail_in_login", function(data) {
+
+        // login failed
+        socket.on("login_fail", function(data) {
             $("#status").text('Wrong Username or Password. Retry.');
         });
-        socket.on("Success_in_login", function(data) {
+        // login succeeded. Set cookies if needed
+        socket.on("login_success", function(data) {
+            Cookies.set('token', data.token, {
+                expires: 3
+            });
+            Cookies.set('sid', data.sid, {
+                expires: 3
+            });
             $("#status").text('');
             $("#form_login").hide(2000);
             $("#form_signup").hide(2000);
             $("#form_submit").show(1000);
+            $("#nowuser").text('Welcome ' + $("#username").val());
+        });
+        socket.on('already_authenticated', function(data) {
+            $("#status").text('');
+            $("#form_login").hide(0);
+            $("#form_signup").hide(0);
+            $("#form_submit").show(0);
             $("#nowuser").text('Welcome ' + $("#username").val());
         });
         socket.on("get_point", function(data) {
@@ -50,7 +67,10 @@
             }
 
             $("#btnlogin").click(function() {
-                let data = new Array($("#username").val(), $("#password").val());
+                let data = {
+                    username: $("#username").val(),
+                    password: $("#password").val(),
+                }
                 socket.emit("login", data);
             });
             // sign up buton, create new account
@@ -160,7 +180,7 @@
                     </div>
                 </div>
                 <div class="side_submit">
-                    <input type="file" id="file1" name="file1" style="content:'Main file'" /><br>
+                    <input type="file" id="file" name="file" style="content:'Main file'"></input><br>
                     <input class="subpro" type="submit" id="send_file" onclick="" />
                 </div>
                 <div class="side_result">
@@ -168,21 +188,15 @@
                         <h4>Result</h4>
                     </div>
                     <div style="text-align:left;font-size:14px">
-                        <p id="pa_result"><b></b></p>
+                        <p id="pa_result">
+                            <b></b>
+                        </p>
                     </div>
                     <div style="float:right" id="btn_view_result">
                         <button id="view_result">Xem kết quả</button>
                     </div>
                 </div>
             </form>
-        </div>
-        <div id="Paris" class="tabcontent">
-            <h3>Paris</h3>
-            <p>Paris is the capital of France.</p>
-        </div>
-        <div id="Tokyo" class="tabcontent">
-            <h3>Tokyo</h3>
-            <p>Tokyo is the capital of Japan.</p>
         </div>
     </div>
 </body>
