@@ -9,7 +9,7 @@ const exec = require('child_process').execFile;
 const server = require('http').createServer(app);
 // socket io initialization
 const io = require('socket.io')(server);
-const port = process.env.PORT || 3000; 
+const port = process.env.PORT || 3000;
 // session for login
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
@@ -79,7 +79,7 @@ io.on("connection", function (socket) {
                 }
                 socket.emit("already_authenticated", {
                     username: decoded.username
-                }); 
+                });
             });
         }
     }
@@ -95,15 +95,20 @@ io.on("connection", function (socket) {
                 jwt.sign(payload, jwtSecret, (err, token) => {
                     let session = socket.request.session;
                     let sid = session.id;
-                    // store the session id and the token in the session store
-                    let data = {
-                        sid,
-                        token
-                    };
-                    sessionStore.set(sid, token, (err) => {
-                        if (err) return console.log(err);
-                        socket.emit('login_success', data)                        
+                    // regenerate the session
+                    session.regenerate((err) => {
+                        console.log(err);
+                        // store the session id and the token in the session store
+                        let data = {
+                            sid,
+                            token
+                        };
+                        sessionStore.set(sid, token, (err) => {
+                            if (err) return console.log(err);
+                            socket.emit('login_success', data)
+                        });
                     });
+
                 });
             }, error => {
                 socket.emit("login_fail", "login_fail");
@@ -132,8 +137,17 @@ io.on("connection", function (socket) {
             }
         });
     });
-    socket.on("logout", function(data) {
-        socket.request.session.destroy();
-        console.log('logged out');
+    socket.on("logout", function (data) {
+        // get the session cookies
+        let cookies = cookie.parse(socket.handshake.headers.cookie);
+        // remove the session on the server's side        
+        sessionStore.destroy(cookies['sid'], err => {
+            if (err) {
+                return console.log(err);
+            }
+            // destroy the session on the client's side
+            socket.request.session.destroy();
+            console.log('logged out');
+        });
     })
 });
