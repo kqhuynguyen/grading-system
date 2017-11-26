@@ -2,9 +2,10 @@
 <html>
 
 <head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&amp;subset=vietnamese" rel="stylesheet">        
     <link rel="stylesheet" href="css_login.css">
     <link rel="stylesheet" href="css_tab.css">
-    <meta charset="utf-8" />
     <title>Login Page</title>
     <script src="jquery.js"></script>
     <script src="socket.io/socket.io.js"></script>
@@ -14,27 +15,26 @@
         var socket = io();
 
         // login failed
-        socket.on("login_fail", function (data) {
+        socket.on("login_fail", function(data) {
             $("#status").text('Wrong Username or Password. Retry.');
         });
         // login succeeded. Set cookies if needed
         socket.on("login_success", function (data) {
-            Cookies.set('token', data.token, { expires: 3 });
-            Cookies.set('sid', data.sid, { expires: 3 });
+            Cookies.set('auth', data, { expires: 3 });
             $("#status").text('');
             $("#form_login").hide(2000);
             $("#form_signup").hide(2000);
             $("#form_submit").show(1000);
             $("#nowuser").text('Welcome ' + $("#username").val());
         });
-        socket.on('already_authenticated', function (data) {
+        socket.on('already_authenticated', function(data) {
             $("#status").text('');
             $("#form_login").hide(0);
             $("#form_signup").hide(0);
             $("#form_submit").show(0);
-            $("#nowuser").text('Welcome ' + $("#username").val());
+            $("#nowuser").text('Welcome ' + data.username);
         });
-        socket.on("get_point", function (data) {
+        socket.on("get_point", function(data) {
             $("#pa_result").text(data);
         });
         socket.on("Exist this account", function(data) {
@@ -45,7 +45,7 @@
             $("#form_signup").hide(2000);
             $("#form_submit").show(1000);
         });
-        $(document).ready(function () {
+        $(document).ready(function() {
             // by default, load form_login first
             // other forms hide
             if ($("#username").val() == '') {
@@ -62,7 +62,7 @@
                 }
             }
 
-            $("#btnlogin").click(function () {
+            $("#btnlogin").click(function() {
                 let data = {
                     username: $("#username").val(),
                     password: $("#password").val(),
@@ -71,7 +71,7 @@
             });
             // sign up buton, create new account
             // hide other form except form_signup
-            $("#btnsignup").click(function () {
+            $("#btnsignup").click(function() {
                 $("#form_submit").hide();
                 $("#form_login").hide();
                 $("#form_signup").show();
@@ -97,10 +97,10 @@
                 }
             });
             // compiler testing, show result
-            $("#view_result").click(function () {
+            $("#view_result").click(function() {
                 socket.emit("wait_for_point", $("#username").val());
             });
-            $("#send_file").click(function () {
+            $("#send_file").click(function() {
                 $("#btn_view_result").show(5000);
             });
         });
@@ -110,19 +110,19 @@
 <body>
     <div class="khunglonbaoquanh" id="form_login">
         <div class="khungtieude">
-            <h1>LOG IN</h1>
+            <div class='login-heading'>LOGIN</div>
         </div>
         <div class="divghinhandata">
-            <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata"/>
+            <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata" />
         </div>
         <div class="divghinhandata">
-            <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata"/>
+            <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata" />
         </div>
         <div class="divghinhandata">
-            <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin"/>
+            <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin" />
         </div>
         <div class="divghinhandata">
-            <input type="submit" value="Don't have an account. Sign up for once" name="submit" class="buttonsignup" style="text-align:center" id="btnsignup"/>
+            <input type="submit" value="Don't have an account. Sign up for once" name="submit" class="buttonsignup" style="text-align:center" id="btnsignup" />
         </div>
         <div class="divstatus">
             <p id="status"></p>
@@ -133,22 +133,22 @@
             <h1>SIGN UP</h1>
         </div>
         <div class="divghinhandata">
-            <input type="text" name="username" id="Susername" placeholder="User Name" class="ghinhandata"/>
+            <input type="text" name="username" id="Susername" placeholder="User Name" class="ghinhandata" />
         </div>
         <div class="divghinhandata">
-            <input type="text" name="usermail" id="Suseremail" placeholder="Email" class="ghinhandata"/>
+            <input type="text" name="usermail" id="Suseremail" placeholder="Email" class="ghinhandata" />
         </div>
         <div class="divghinhandata">
-            <input type="password" name="password" id="Spassword" placeholder="Password" class="ghinhandata"/>
+            <input type="password" name="password" id="Spassword" placeholder="Password" class="ghinhandata" />
         </div>
         <div class="divghinhandata">
-            <input type="password" name="cpassword" id="Scpassword" placeholder="Confirm password" class="ghinhandata"/>
+            <input type="password" name="cpassword" id="Scpassword" placeholder="Confirm password" class="ghinhandata" />
         </div>
         <div class="divghinhandata">
-            <input type="submit" value="Sign up and Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnSL"/>
+            <input type="submit" value="Sign up and Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnSL" />
         </div>
         <div class="divghinhandata">
-            <input type="submit" value="Already have an account. Log in." name="submit" class="buttonsignup" style="text-align:center" id="btnlogback"/>
+            <input type="submit" value="Already have an account. Log in." name="submit" class="buttonsignup" style="text-align:center" id="btnlogback" />
         </div>
         <div class="divstatus">
             <p id="status1"></p>
