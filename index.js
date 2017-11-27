@@ -16,7 +16,7 @@ const FileStore = require('session-file-store')(session);
 const sessionStore = new FileStore({
     secret: 'Glory to the State'
 });
-// cookie parser
+// cookie parser 
 const cookie = require('cookie');
 // JSON web token for authentication
 const jwt = require('jsonwebtoken');
