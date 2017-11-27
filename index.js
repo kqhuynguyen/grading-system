@@ -14,9 +14,9 @@ const port = process.env.PORT || 3000;
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const sessionStore = new FileStore({
-    secret: 'Glory to the State'
+    secret: 'Glory to the State' 
 });
-// cookie parser 
+// cookie parser
 const cookie = require('cookie');
 // JSON web token for authentication
 const jwt = require('jsonwebtoken');
