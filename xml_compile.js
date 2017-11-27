@@ -31,41 +31,41 @@ module.exports = {
             });
         });
     },
-    runExeFile: function (id, times_submit,inflow,outflow,onsuccess) {
-    let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/';
-    let childProcess = require('child_process');
-    setTimeout(function(){
-    let newprocess=require('child_process');
-    newprocess.exec('taskkill /F /IM '+id+'.exe',{cwd:sourceCpp},function(error,stdout,stderr){
-          if(error) console.log('Run file successfully !');
-          else {
-            let typeFault='Stack overflow !';
-            onsuccess(typeFault,null);
-          }
-       });
-    },3000);
-    childProcess.exec(id + '.exe'+' <'+inflow+'>'+' '+outflow, {
-      cwd: sourceCpp
-    }, (error, stdout, stderr) => {
-      if (error) {
-        console.log(error);
-      }
-      console.log(stdout);
-      onsuccess(null,'1');
-    });
-  },
+    runExeFile: function(id, times_submit, inflow, outflow, onsuccess) {
+        let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/';
+        let childProcess = require('child_process');
+        setTimeout(function() {
+            let newprocess = require('child_process');
+            newprocess.exec('taskkill /F /IM ' + id + '.exe', { cwd: sourceCpp }, function(error, stdout, stderr) {
+                if (error) console.log('Run file successfully !');
+                else {
+                    let typeFault = 'Stack overflow !';
+                    onsuccess(typeFault, null);
+                }
+            });
+        }, 3000);
+        childProcess.exec(id + '.exe' + ' <' + inflow + '>' + ' ' + outflow, {
+            cwd: sourceCpp
+        }, (error, stdout, stderr) => {
+            if (error) {
+                console.log(error);
+            }
+            console.log(stdout);
+            onsuccess(null, '1');
+        });
+    },
 
     grading: function(id, times_submit) {
         // checkpoint exe compare lec and stu output to get score
-      let checkPoint = __dirname + '/checkPoint.exe';
+        let checkPoint = __dirname + '/checkPoint.exe';
         // lecturer output
-      let lecturerOutput = __dirname + '/Data/result_testkey/' + 'result.txt';
+        let lecturerOutput = __dirname + '/Data/result_testkey/' + 'result.txt';
         // student output
-      let studentOutput = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/output.txt';
+        let studentOutput = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/output.txt';
 
-      let childProcess = require('child_process');
+        let childProcess = require('child_process');
         // COMMAND: checkpoint lecOutput stuOutput
-      childProcess.exec(checkPoint + ' ' + lecturerOutput + ' ' + studentOutput, (error, stdout, stderr) => {
+        childProcess.exec(checkPoint + ' ' + lecturerOutput + ' ' + studentOutput, (error, stdout, stderr) => {
             if (error)
                 console.log(error);
             console.log(stdout);

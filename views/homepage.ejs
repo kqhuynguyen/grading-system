@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&amp;subset=vietnamese" rel="stylesheet">        
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&amp;subset=vietnamese" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/tabs.css">
     <title>Login Page</title>
@@ -13,26 +13,27 @@
     <script src="js/tabs.js"></script>
     <script src="js/main.js"></script>
 </head>
+
 <body>
     <div class="auth-container" id="form_login">
-            <div class="khungtieude">
-                <div class='auth-header'>LOGIN</div>
+        <div class="khungtieude">
+            <div class='auth-header'>LOGIN</div>
+        </div>
+        <form action="javascript:void(0);">
+            <div class="divghinhandata">
+                <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata" />
             </div>
-            <form action="javascript:void(0);">
-                <div class="divghinhandata">
-                    <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata" />
-                </div>
-                <div class="divghinhandata">
-                    <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata" />
-                </div>
-                <div class="divghinhandata">
-                    <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin" />
-                </div>
-                <div class="divstatus">
-                    <p id="status"></p>
-                </div>
-            </form>
-            <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>            
+            <div class="divghinhandata">
+                <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata" />
+            </div>
+            <div class="divghinhandata">
+                <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin" />
+            </div>
+            <div class="divstatus">
+                <p id="status"></p>
+            </div>
+        </form>
+        <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>
     </div>
     <div class="auth-container" id="form_signup">
         <div class="khungtieude">
@@ -58,13 +59,13 @@
                 <p id="status1"></p>
             </div>
         </form>
-            <div class="auth-footer"> Already have an account? <a class="auth-link" id="login-link">Log in!</a></div>
+        <div class="auth-footer"> Already have an account? <a class="auth-link" id="login-link">Log in!</a></div>
     </div>
     <div id="form_submit">
         <div class="tab">
             <button class="tablinks" onclick="openCity(event, 'London')">Submit</button>
             <button class="tablinks" onclick="openCity(event, 'Paris')">Points</button>
-            <button class="tablinks" onclick="openCity(event, 'Tokyo')">Chat</button>
+            <button class="tablinks" onclick="openCity(event, 'Seoul')">Chat</button>
             <button class="tablinks" onclick="openCity(event, 'Tokyo')">Rank</button>
             <button class="Logout" style="float:right;color:white" onclick="logout()">Log out</button>
         </div>
@@ -99,6 +100,16 @@
                     </div>
                 </div>
             </form>
+        </div>
+        <div id="Paris" class="tabcontent">
+            <div id="scorePoint">
+
+            </div>
+        </div>
+        <div id="Tokyo" class="tabcontent">
+            <div id="rank">
+
+            </div>
         </div>
     </div>
 </body>
