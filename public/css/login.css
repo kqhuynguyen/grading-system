@@ -8,7 +8,7 @@
     p {
         font-family: "Leelawadee UI";
     }
-    .login-heading {
+    .auth-header {
         font-weight: 300;
         letter-spacing: 2px;
         text-transform: uppercase;
@@ -27,12 +27,13 @@
         width: 100%;
     }
     
-    .khunglonbaoquanh {
+    .auth-container {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         border-radius: 5px;
-        margin-top: 12%;
-        margin-left: 35%;
-        width: 30%;
-        height: 400px;
+        padding: 4% 3%;
         background-color: #ffffff;
         -webkit-box-shadow: 5px 5px 5px #555555;
                 box-shadow: 5px 5px 5px #555555;
@@ -64,17 +65,30 @@
         margin-left: 8%;
     }
     
-    .buttonsignup {
-        width: 80%;
-        height: 30px;
-        color: #f00000;
-        background-color: inherit;
-        text-align: center;
-        border-radius: 4px;
-        border: none;
-        margin-left: 8%;
+    .btn {
+        border-radius: 200px;
+        padding: 20px 0px;
+        border: 1px solid #2980b9;
     }
-    
+    .auth-footer {
+        font-family: Roboto;
+        font-weight: 300;
+        color: #888;
+        text-align: center;
+        position: relative;
+        transform: translateY('-50%');
+    }
+   
+    .auth-link,
+    .auth-link:link,
+    .auth-link:visited {
+        color: #2980b9;
+    }
+    .auth-link:hover,
+    .auth-link:active {
+        cursor: pointer;        
+        color: #3293d2;
+    }
     .divstatus {
         height: 50px;
         width: 100%;

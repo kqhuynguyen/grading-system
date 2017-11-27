@@ -87,6 +87,7 @@ module.exports = {
         },
         unzipFileSubmit: function (id, result) {
             let db = require('./testdatabase.js');
+            // get number of submit
             db.GetTimesSubmitOfStudent(id, function (times_submit) {
                     let now_submit = Number(times_submit) + 1;
                     let rename = require('./copymove.js');
@@ -121,6 +122,8 @@ module.exports = {
                                                             });
                                                         });
                                                     });
+
+                                                    // create an xml
                                                     let xmlCompile = require('./xml_compile.js');
                                                     xmlCompile.readXmlAndCompile(id, now_submit, function (error, success) {
                                                         if (error) {
