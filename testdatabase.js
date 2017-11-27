@@ -81,45 +81,51 @@ module.exports = {
             }
         });
     },
-    unzipFileSubmit: function(id, result) {
-        let db = require('./testdatabase.js');
-        db.GetTimesSubmitOfStudent(id, function(times_submit) {
-            let now_submit = Number(times_submit) + 1;
-            let rename = require('./copymove.js');
-            let oldpath = __dirname + '/Data/' + id + '/' + id + '.zip';
-            let newpath = __dirname + '/Data/' + id + '/submit' + now_submit + '.zip';
-            rename.moveFile(oldpath, newpath, function() {
-                let extract = require('extract-zip');
-                extract(newpath, { dir: __dirname + '/Data/' + id }, function(err) {
-                    if (err) console.log(err);
-                    else {
-                        console.log('extract file successfully !');
-                        let old_folder = __dirname + '/Data/' + id + '/submit';
-                        let newfolder = __dirname + '/Data/' + id + '/submit' + now_submit;
-                        rename.moveFile(old_folder, newfolder, function() {
-                            let DataStudent = './DataStudent/Danhsachsinhvien.csv';
-                            db.editCellInData(id, DataStudent, 2, now_submit, function() {
-                                db.createXmlFileFromFolder(id, function() {
-                                    let fs = require('fs');
-                                    let buildFolder = './Data/' + id + '/submit' + now_submit + '/build';
-                                    fs.mkdirSync(buildFolder);
-                                    let xmlCompile = require('./xml_compile.js');
-                                    xmlCompile.readXmlAndCompile(id, now_submit, function(error, success) {
-                                        if (error) {
-                                            result(error, null);
-                                            fs.unlinkSync(newfolder + '/' + id + '.exe');
-                                        } else {
-                                            rename.moveFile(newfolder + '/' + id + '.exe', newfolder + '/build/' + id + '.exe', function() {
-                                                xmlCompile.runExeFile(id, now_submit, function() {
-
-                                                });
-                                                xmlCompile.grading(id, now_submit, function() {
-
-                                                });
-                                            });
-                                        }
-                                    });
-                                });
+    unzipFileSubmit:function(id,result){
+     let db=require('./testdatabase.js');
+     db.GetTimesSubmitOfStudent(id,function(times_submit){
+       let now_submit=Number(times_submit)+1;
+       let rename=require('./copymove.js');
+       let oldpath=__dirname+'/Data/'+id+'/'+id+'.zip';
+       let newpath=__dirname+'/Data/'+id+'/submit'+now_submit+'.zip';
+       rename.moveFile(oldpath,newpath,function(){
+       let extract=require('extract-zip');
+       extract(newpath,{dir:__dirname+'/Data/'+id},function(err){
+       if(err) console.log(err);
+       else {
+              console.log('extract file successfully !');
+              let old_folder=__dirname+'/Data/'+id+'/submit';
+              let newfolder=__dirname+'/Data/'+id+'/submit'+now_submit;
+              rename.moveFile(old_folder,newfolder,function(){
+              let DataStudent='./DataStudent/Danhsachsinhvien.csv';
+              db.editCellInData(id,DataStudent,2,now_submit,function(){
+                db.createXmlFileFromFolder(id,function(){
+                      let fs=require('fs');
+                      let buildFolder='./Data/'+id+'/submit'+now_submit+'/build';
+                      fs.mkdirSync(buildFolder);
+                      let sourceCreatetestcase='./public/';
+                      rename.copyFile(sourceCreatetestcase+'createtestcase.exe',buildFolder,function(){
+                         rename.copyFile(sourceCreatetestcase+'libstdc++-6.dll',buildFolder,function(){
+                            let createtestcase=require('child_process');
+                            createtestcase.exec('createtestcase.exe',{cwd:buildFolder},function(err,stdout,stderr){
+                               if(err) console.log(err);
+                               else console.log(stdout);
+                             });
+                          });
+                      });
+                      let xmlCompile=require('./xml_compile.js');
+                      xmlCompile.readXmlAndCompile(id,now_submit,function(error,success){
+                        if(error) {result(error,null);fs.unlinkSync(newfolder+'/'+id+'.exe');}
+                        else{rename.moveFile(newfolder+'/'+id+'.exe',newfolder+'/build/'+id+'.exe',function(){
+                              xmlCompile.runExeFile(id,now_submit,'input1.txt','output1.txt',function(err,success){
+                                if(err){
+                                  result(err,null);
+                                }
+                                else {
+                                  xmlCompile.runExeFile(id,now_submit,'input2.txt','output2.txt',function(err1,success1){
+                                    if(err1) result(err1,null);
+                                  });
+                                }
                             });
                         });
                     }

@@ -3,5 +3,8 @@
 using namespace std;
 int main()
 {
-	showsum(5,6);
+	float arr[10000]; int dem;
+	readFileData(arr, dem);
+	process(arr, dem);
+	return 0;
 }
