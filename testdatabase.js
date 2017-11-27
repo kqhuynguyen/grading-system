@@ -88,15 +88,16 @@ module.exports = {
        let rename=require('./copymove.js');
        let oldpath=__dirname+'/Data/'+id+'/'+id+'.zip';
        let newpath=__dirname+'/Data/'+id+'/submit'+now_submit+'.zip';
+       let tempfolder=__dirname+'/Data/'+id+'/temp';
        rename.moveFile(oldpath,newpath,function(){
        let extract=require('extract-zip');
-       extract(newpath,{dir:__dirname+'/Data/'+id},function(err){
+       extract(newpath,{dir:tempfolder},function(err){
        if(err) console.log(err);
        else {
               console.log('extract file successfully !');
-              let old_folder=__dirname+'/Data/'+id+'/submit';
               let newfolder=__dirname+'/Data/'+id+'/submit'+now_submit;
-              rename.moveFile(old_folder,newfolder,function(){
+              let sourcefile=__dirname+'/Data/'+id+'/submit'+now_submit;
+              db.editNameAfterUnzip(tempfolder,sourcefile,function(){
               let DataStudent='./DataStudent/Danhsachsinhvien.csv';
               db.editCellInData(id,DataStudent,2,now_submit,function(){
                 db.createXmlFileFromFolder(id,function(){
@@ -109,30 +110,86 @@ module.exports = {
                             let createtestcase=require('child_process');
                             createtestcase.exec('createtestcase.exe',{cwd:buildFolder},function(err,stdout,stderr){
                                if(err) console.log(err);
-                               else console.log(stdout);
+                               else
+                               {
+                                 setTimeout(function(){
+                                 let xmlCompile=require('./xml_compile.js');
+                                 let sumpoint=0;
+                                 xmlCompile.readXmlAndCompile(id,now_submit,function(error,success){
+                                   if(error) {result(error,null);fs.unlinkSync(newfolder+'/'+id+'.exe');
+                                   fs.writeFile(buildFolder+'/fault.txt',error,function(err){
+                                        if(err) console.log(err);
+                                      });
+                                   }
+                                   else{rename.moveFile(newfolder+'/'+id+'.exe',newfolder+'/build/'+id+'.exe',function(){
+                                         let tempdir='./Data/execute_exe';
+                                         db.copyandrename(buildFolder,'input1.txt',tempdir,'input.txt',function(){
+                                         xmlCompile.runExeFile(id,now_submit,function(err,success){
+                                           if(err){
+                                             result(err,sumpoint);
+                                             fs.writeFile(buildFolder+'/fault.txt',err,function(err2){
+                                                  if(err2) console.log(err2);
+                                                });
+                                           }
+                                           else {
+                                             xmlCompile.grading(id,now_submit,'1',function(point1){
+                                             rename.moveFile(buildFolder+'/outputX.txt',buildFolder+'/outputX1.txt',function(){
+                                             sumpoint+=0.3*Number(point1);
+                                             db.copyandrename(buildFolder,'input2.txt',tempdir,'input.txt',function(){
+                                             xmlCompile.runExeFile(id,now_submit,function(err1,success1){
+                                               if(err1) {
+                                                 result(err1,sumpoint);
+                                                 fs.writeFile(buildFolder+'/fault.txt',err1,function(err3){
+                                                      if(err3) console.log(err3);
+                                                    });
+                                               }
+                                               else {
+                                                         xmlCompile.grading(id,now_submit,'2',function(point2){
+                                                             rename.moveFile(buildFolder+'/outputX.txt',buildFolder+'/outputX2.txt',function(){
+                                                             sumpoint+=0.7*Number(point2);
+                                                             result(null,sumpoint);
+                                                           });
+                                                         });
+                                                       }
+                                                   });
+                                                 });
+                                               });
+                                             });
+                                           }
+                                        });
+                                      });
+                                    });
+                                  }
+
+                                 });
+                               },2000);
+
+                               rename.copyFile(sourceCreatetestcase+'runtestcase.exe',buildFolder,function(){
+                                    let runtestcase=require('child_process');
+                                    runtestcase.exec('runtestcase.exe <input1.txt> result1.txt',{cwd:buildFolder+'/'},function(err,stdout,stderr){
+                                      if(err) console.log(err);
+                                      else {
+                                        runtestcase.exec('runtestcase.exe <input2.txt> result2.txt',{cwd:buildFolder+'/'},function(err,stdout,stderr){
+                                           if(err) console.log(err);
+                                           else {
+
+                                            }
+                                         });
+                                       }
+                                    });
+                                  });
+                               }
                              });
                           });
                       });
-                      let xmlCompile=require('./xml_compile.js');
-                      xmlCompile.readXmlAndCompile(id,now_submit,function(error,success){
-                        if(error) {result(error,null);fs.unlinkSync(newfolder+'/'+id+'.exe');}
-                        else{rename.moveFile(newfolder+'/'+id+'.exe',newfolder+'/build/'+id+'.exe',function(){
-                              xmlCompile.runExeFile(id,now_submit,'input1.txt','output1.txt',function(err,success){
-                                if(err){
-                                  result(err,null);
-                                }
-                                else {
-                                  xmlCompile.runExeFile(id,now_submit,'input2.txt','output2.txt',function(err1,success1){
-                                    if(err1) result(err1,null);
-                                  });
-                                }
-                            });
-                        });
-                    }
-                });
+                  });
+              });
             });
-        });
-    },
+          }
+      });
+    });
+  });
+},
     editCellInData: function(id, source, collum, newcell, onsuccess) {
         editOneCell(id, source, collum, newcell, function(filedata) {
             let write = require('fs');
@@ -169,5 +226,50 @@ module.exports = {
                 });
             });
         });
+    },
+    copyandrename:function(filesource,oldname,tempdir,newname,success){
+      let copymove=require('./copymove.js');
+      copymove.copyFile(filesource+'/'+oldname,tempdir,function(){
+         copymove.moveFile(tempdir+'/'+oldname,filesource+'/'+newname,function(){
+           success();
+         });
+      });
+    },
+    getFileResult:function(id,success){
+      let db=require('./testdatabase.js');
+      db.GetTimesSubmitOfStudent(id,function(times_submit){
+        let buildFolder = __dirname + "/Data/" + id + "/submit"+times_submit+'/build';
+        let result1;let result2;let result3;
+        let fs=require('fs');
+        if(fs.existsSync(buildFolder+'/outputX1.txt')){
+          result1=fs.readFileSync(buildFolder+'/outputX1.txt','utf8');
+        }else result1='';
+        if(fs.existsSync(buildFolder+'/outputX2.txt')){
+          result2=fs.readFileSync(buildFolder+'/outputX2.txt','utf8');
+        }else result2='';
+        if(fs.existsSync(buildFolder+'/fault.txt')){
+          result3=fs.readFileSync(buildFolder+'/fault.txt','utf8');
+        }else result3='';
+        let filedata='./DataStudent/Danhsachsinhvien.csv';
+        db.getCellInData(id,filedata,'3',function(point){
+            success(result1,result2,result3,point);
+        });
+      });
+    },
+    getCellInData:function(id, source,collum,onsuccess){
+      let lineread = require('line-reader');
+      lineread.eachLine(source, function(line, last) {
+        let separate=line.split(',');
+        if(separate[0]==id){onsuccess(separate[Number(collum)]);}
+      });
+    },
+    editNameAfterUnzip:function(temp,source,onsuccess){
+      let fs=require('fs');
+      fs.readdir(temp,function(err,files){
+          let copymove=require('./copymove.js');
+          copymove.moveFile(temp+'/'+files[0],source,function(){
+            onsuccess();
+          });
+      });
     }
 }

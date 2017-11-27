@@ -31,7 +31,7 @@ module.exports = {
             });
         });
     },
-    runExeFile: function (id, times_submit,inflow,outflow,onsuccess) {
+    runExeFile: function (id, times_submit,onsuccess) {
     let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/';
     let childProcess = require('child_process');
     setTimeout(function(){
@@ -44,7 +44,7 @@ module.exports = {
           }
        });
     },3000);
-    childProcess.exec(id + '.exe'+' <'+inflow+'>'+' '+outflow, {
+    childProcess.exec(id + '.exe',{
       cwd: sourceCpp
     }, (error, stdout, stderr) => {
       if (error) {
@@ -55,11 +55,11 @@ module.exports = {
     });
   },
 
-    grading: function(id, times_submit) {
+    grading: function(id, times_submit,numtestcase,success) {
         // checkpoint exe compare lec and stu output to get score
       let checkPoint = __dirname + '/checkPoint.exe';
         // lecturer output
-      let lecturerOutput = __dirname + '/Data/result_testkey/' + 'result.txt';
+      let lecturerOutput =__dirname + '/Data/' + id + '/submit' + times_submit + '/build/result'+numtestcase+'.txt';
         // student output
       let studentOutput = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/output.txt';
 
@@ -68,7 +68,7 @@ module.exports = {
       childProcess.exec(checkPoint + ' ' + lecturerOutput + ' ' + studentOutput, (error, stdout, stderr) => {
             if (error)
                 console.log(error);
-            console.log(stdout);
+            console.log(stdout);success(stdout);
         });
     },
     /*
