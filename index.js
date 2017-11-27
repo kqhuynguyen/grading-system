@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const sessionStore = new FileStore({
-    secret: 'Glory to the State'
+    secret: 'Glory to the State' 
 });
 // cookie parser
 const cookie = require('cookie');
@@ -48,7 +48,10 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
             fs.writeFile(pathUpload, data, function () {
               let db=require('./testdatabase.js');
               db.unzipFileSubmit(originalFilename.split('.')[0],function(err,suc){
-              if(err) console.log('Fault: '+err);
+              if(suc==null) suc=0;
+              if(err) {console.log('Fault: '+err+' ; '+'Point: '+suc);}
+              let filedata='./DataStudent/Danhsachsinhvien.csv';
+              db.editCellInData(originalFilename.split('.')[0],filedata,'3',suc,function(){});
               });
             });
         } else console.log(err);
@@ -67,7 +70,7 @@ server.listen(port, () => {
 
 io.on("connection", function (socket) {
     console.log("Connection found: " + socket.id);
-    
+
     if (socket.handshake.headers.cookie) {
         let cookies = cookie.parse(socket.handshake.headers.cookie);
         // check if the token exists in the cookie
@@ -114,13 +117,10 @@ io.on("connection", function (socket) {
             });
     });
     socket.on("wait_for_point", function (id) {
-        let id_pathfile = __dirname + "/Data/" + id + "/output.txt";
-        fs.readFile(id_pathfile, function (err, data) {
-            if (err) console.log(err);
-            else {
-                socket.emit("get_point", data.toString('utf8'));
-                fs.unlink(id_pathfile);
-            }
+        let db=require('./testdatabase.js');
+        db.getFileResult(id,function(result1,result2,result3,point){
+          let result=new Array(result1,result2,result3,point);
+          socket.emit("your_result",result);
         });
     });
     socket.on("signup", function (data) {
