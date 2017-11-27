@@ -5,7 +5,7 @@ function return_timesubmit(timesSubmit) {
 function getTimesSubmitOfStudent(username, onsuccess) {
     let lineReader = require('line-reader');
     let fileData = __dirname + "/DataStudent/Danhsachsinhvien.csv";
-    lineReader.eachLine(fileData, function(line, last) {
+    lineReader.eachLine(fileData, function (line, last) {
         let seperate = line.split(',');
         if (seperate[0] == username) onsuccess(seperate[2]);
     });
@@ -14,39 +14,37 @@ function getTimesSubmitOfStudent(username, onsuccess) {
 function editOneCell(id, source, collum, newcell, success) {
     let filedata = '';
     let lineread = require('line-reader');
-    lineread.eachLine(source, function(line, last) {
+    lineread.eachLine(source, function (line, last) {
         let arrline = line.split(',');
         if (arrline[0] != id) filedata += line + '\r\n';
         else {
             arrline[Number(collum)] = newcell;
             let editline = '';
-            for (let i = 0; i < arrline.length - 1; ++i) { editline += arrline[i] + ','; }
+            for (let i = 0; i < arrline.length - 1; ++i) {
+                editline += arrline[i] + ',';
+            }
             editline += arrline[arrline.length - 1];
             filedata += editline + '\r\n';
         }
-        if (last) { success(filedata); }
+        if (last) {
+            success(filedata);
+        }
     });
 }
 module.exports = {
-    checkLoginCSV: function(username, password) {
-        return new Promise((resolve, reject) => {
-            let lineReader = require('line-reader');
-            let fileData = __dirname + "/DataStudent/Account.csv";
-            lineReader.eachLine(fileData, function(line, last) {
-                if (line.split(',')[0] == username) {
-                    if (line.split(',')[1] == password) {
-                        return resolve(line);
-                    } else return reject("Wrong password");
-                }
-                if (last) {
+        checkLoginCSV: function (username, password) {
+            return new Promise((resolve, reject) => {
+                let lineReader = require('line-reader');
+                let fileData = __dirname + "/DataStudent/Account.csv";
+                lineReader.eachLine(fileData, function (line, last) {
                     if (line.split(',')[0] == username) {
                         if (line.split(',')[1] == password) {
                             return resolve(line);
                         } else return reject("Wrong password");
-                    } else return reject("Wrong username");
-                }
+                    }
+                    if(last) return reject("Wrong username");
+                });
             });
-        });
     },
     waitForSecond: function(ms, afterWait) {
         let start = new Date().getTime();
@@ -193,18 +191,18 @@ module.exports = {
     editCellInData: function(id, source, collum, newcell, onsuccess) {
         editOneCell(id, source, collum, newcell, function(filedata) {
             let write = require('fs');
-            write.writeFile('./DataStudent/Danhsachsinhvien.csv', filedata, function(err) {
+            write.writeFile('./DataStudent/Danhsachsinhvien.csv', filedata, function (err) {
                 if (err) console.log(err);
                 else onsuccess();
             });
         });
     },
-    createXmlFileFromFolder: function(id, onsuccess) {
+    createXmlFileFromFolder: function (id, onsuccess) {
         let db = require('./testdatabase.js');
-        db.GetTimesSubmitOfStudent(id, function(times_submit) {
+        db.GetTimesSubmitOfStudent(id, function (times_submit) {
             let desfile = './Data/' + id + '/submit' + times_submit;
             let fs = require('fs');
-            fs.readdir(desfile, function(err, files) {
+            fs.readdir(desfile, function (err, files) {
                 if (err) console.log(err);
                 let xmlbuild = require('xmlbuilder');
                 let xmlfile = xmlbuild.create('project');
@@ -218,9 +216,11 @@ module.exports = {
                         xmlfile.ele('main').txt(files[i]);
                     }
                 }
-                let data = xmlfile.toString({ pretty: true });
+                let data = xmlfile.toString({
+                    pretty: true
+                });
                 let filename = 'project.xml';
-                fs.writeFile(desfile + '/' + filename, data, function(err) {
+                fs.writeFile(desfile + '/' + filename, data, function (err) {
                     if (err) console.log(err);
                     onsuccess();
                 });

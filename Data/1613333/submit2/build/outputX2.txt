@@ -1,0 +1,6 @@
+This is result after testing completely. If there is a '!' in a line, which means that line is an incorrect value.
+Your point depends on how many '!' appear in your result.
+2.83386e+026!
+7.37897e+028!
+1.36305e+019!
+-6.164e-033!
