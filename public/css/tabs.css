@@ -1,5 +1,6 @@
 .tab {
     overflow: hidden;
+    background-color: #fefefe;
     height: 60px;
 }
 
@@ -16,14 +17,14 @@
     width: 150px;
     font-size: 20px;
     color: #2980b9;
-    background-color: #fefefe;
     text-transform: uppercase;
     font-weight: 300;
     height: 100%;
+    background-color: #fefefe;
 }
 .tablinks:hover,
 .tablinks:active {
-    
+
     background-color: #2980b9;
     color: #fefefe;
 }
