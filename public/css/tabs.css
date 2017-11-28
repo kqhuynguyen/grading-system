@@ -23,6 +23,7 @@
 }
 .tablinks:hover,
 .tablinks:active {
+    
     background-color: #2980b9;
     color: #fefefe;
 }
