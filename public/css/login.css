@@ -13,13 +13,10 @@
         letter-spacing: 2px;
         text-transform: uppercase;
         font-size: 250%;
-        position: relative;
-        top: 50%;
-        -webkit-transform: translateY(-50%);
-                transform: translateY(-50%);
         text-align: center;
         color: #1c1c1c;
         font-family: 'Roboto';
+        margin: 20px 0;
     }
 
     .khungtieude {
@@ -28,12 +25,14 @@
     }
     
     .auth-container {
+        height: 400px;
+        width: 400px;
         position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
         border-radius: 5px;
-        padding: 4% 3%;
+        padding: 2% 1%;
         background-color: #ffffff;
         -webkit-box-shadow: 5px 5px 5px #555555;
                 box-shadow: 5px 5px 5px #555555;
@@ -49,12 +48,12 @@
         padding-right: 3%;
     }
     
-    .divghinhandata {
-        padding-left: 5.5%;
-        padding-bottom: 4%;
+    .auth-field {
+        margin-bottom: 20px;
+        text-align: center;
     }
     
-    .buttonlogin {
+    .btn-login {
         width: 80%;
         height: 30px;
         background-color: #2980b9;
@@ -62,7 +61,6 @@
         color: white;
         border-radius: 4px;
         border: none;
-        margin-left: 8%;
     }
     
     .btn {
