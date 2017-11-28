@@ -31,52 +31,45 @@ module.exports = {
             });
         });
     },
-    runExeFile: function (id, times_submit,onsuccess) {
-    let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/';
-    let childProcess = require('child_process');
-    setTimeout(function(){
-    let newprocess=require('child_process');
-    newprocess.exec('taskkill /F /IM '+id+'.exe',{cwd:sourceCpp},function(error,stdout,stderr){
-          if(error) console.log('Run file successfully !');
-          else {
-            let typeFault='Stack overflow !';
-            onsuccess(typeFault,null);
-          }
-       });
-    },3000);
-    childProcess.exec(id + '.exe',{
-      cwd: sourceCpp
-    }, (error, stdout, stderr) => {
-      if (error) {
-        console.log(error);
-      }
-      console.log(stdout);
-      onsuccess(null,'1');
-    });
-  },
-
-    grading: function(id, times_submit,numtestcase,success) {
-        // checkpoint exe compare lec and stu output to get score
-      let checkPoint = __dirname + '/checkPoint.exe';
-        // lecturer output
-      let lecturerOutput =__dirname + '/Data/' + id + '/submit' + times_submit + '/build/result'+numtestcase+'.txt';
-        // student output
-      let studentOutput = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/output.txt';
-
-      let childProcess = require('child_process');
-        // COMMAND: checkpoint lecOutput stuOutput
-      childProcess.exec(checkPoint + ' ' + lecturerOutput + ' ' + studentOutput, (error, stdout, stderr) => {
-            if (error)
+    runExeFile: function(id, times_submit, onsuccess) {
+        let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/';
+        let childProcess = require('child_process');
+        setTimeout(function() {
+            let newprocess = require('child_process');
+            newprocess.exec('taskkill /F /IM ' + id + '.exe', { cwd: sourceCpp }, function(error, stdout, stderr) {
+                if (error) console.log('Run file successfully !');
+                else {
+                    let typeFault = 'Stack overflow !';
+                    onsuccess(typeFault, null);
+                }
+            });
+        }, 3000);
+        childProcess.exec(id + '.exe', {
+            cwd: sourceCpp
+        }, (error, stdout, stderr) => {
+            if (error) {
                 console.log(error);
-            console.log(stdout);success(stdout);
+            }
+            console.log(stdout);
+            onsuccess(null, '1');
         });
     },
-    /*
-    updateGrade: function(score) {
-        let lineReader = require('line-reader');
-        let fileData = __dirname + '/DataStudent/Danhsachsinhvien.csv';
-        lineReader.eachLine(fileData, function(line) {
-            line.split(',')[3] = 0.3 * score;
+
+    grading: function(id, times_submit, numtestcase, success) {
+        // checkpoint exe compare lec and stu output to get score
+        let checkPoint = __dirname + '/checkPoint.exe';
+        // lecturer output
+        let lecturerOutput = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/result' + numtestcase + '.txt';
+        // student output
+        let studentOutput = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/output.txt';
+
+        let childProcess = require('child_process');
+        // COMMAND: checkpoint lecOutput stuOutput
+        childProcess.exec(checkPoint + ' ' + lecturerOutput + ' ' + studentOutput, (error, stdout, stderr) => {
+            if (error)
+                console.log(error);
+            console.log(stdout);
+            success(stdout);
         });
-    }*/
+    },
 }

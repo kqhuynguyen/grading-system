@@ -1,0 +1,96 @@
+    html {
+        background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.5)), to(rgba(0, 0, 0, 0.5))), url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) no-repeat center center fixed;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    h1,
+    p {
+        font-family: "Leelawadee UI";
+    }
+    .auth-header {
+        font-weight: 300;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: 250%;
+        text-align: center;
+        color: #1c1c1c;
+        font-family: 'Roboto';
+        margin: 20px 0;
+    }
+
+    .khungtieude {
+        height: 30%;
+        width: 100%;
+    }
+
+    .auth-container {
+        height: 450px;
+        width: 400px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 5px;
+        padding: 2% 1%;
+        background-color: #ffffff;
+        -webkit-box-shadow: 5px 5px 5px #555555;
+                box-shadow: 5px 5px 5px #555555;
+    }
+
+    .ghinhandata {
+        width: 90%;
+        height: 30px;
+        background-color: #f1f1f1;
+        border: none;
+        border-radius: 4px;
+        padding-left: 3%;
+        padding-right: 3%;
+    }
+
+    .auth-field {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .btn-login {
+        width: 80%;
+        height: 30px;
+        background-color: #2980b9;
+        text-align: center;
+        color: white;
+        border-radius: 4px;
+        border: none;
+    }
+
+    .btn {
+        border-radius: 200px;
+        padding: 20px 0px;
+        border: 1px solid #2980b9;
+    }
+    .auth-footer {
+        font-family: Roboto;
+        font-weight: 300;
+        color: #888;
+        text-align: center;
+        position: relative;
+        transform: translateY('-50%');
+    }
+
+    .auth-link,
+    .auth-link:link,
+    .auth-link:visited {
+        color: #2980b9;
+    }
+    .auth-link:hover,
+    .auth-link:active {
+        cursor: pointer;
+        color: #3293d2;
+    }
+    .divstatus {
+        height: 50px;
+        width: 100%;
+        text-align: center;
+        color: #c0392b;
+        font-size: 20px;
+    }

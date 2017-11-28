@@ -1,5 +1,0 @@
-Error: Command failed: g++ fileheader.h filesource.cpp main.cpp -o 1612222
-filesource.cpp: In function 'void process(std::__cxx11::string, float*, int)':
-filesource.cpp:32:2: error: expected ';' before 'file'
-  file.close();
-  ^~~~
