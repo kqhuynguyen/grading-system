@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="css/normalize.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&amp;subset=vietnamese" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/tabs.css">
@@ -16,46 +17,42 @@
 
 <body>
     <div class="auth-container" id="form_login">
-        <div class="khungtieude">
             <div class="auth-header">LOG IN</div>
-        </div>
         <form action="javascript:void(0);">
-            <div class="divghinhandata">
-                <input type="text" name="username" id="username" placeholder="User Name" class="ghinhandata" />
+            <div class="auth-field">
+                <input type="text" name="username" id="username" placeholder="Username" class="ghinhandata" />
             </div>
-            <div class="divghinhandata">
+            <div class="auth-field">
                 <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata" />
             </div>
-            <div class="divghinhandata">
-                <input type="submit" value="Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnlogin" />
+            <div class="auth-field">
+                <input type="submit" value="Log in" name="submit" class="btn-login" style="text-align:center" id="btnlogin" />
             </div>
-            <div class="divstatus">
+            <div class="auth-status">
                 <p id="status"></p>
             </div>
         </form>
         <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>
     </div>
     <div class="auth-container" id="form_signup">
-        <div class="khungtieude">
             <div class="auth-header">SIGN UP</div>
-        </div>
         <form action="javascript:void(0);">
-            <div class="divghinhandata">
-                <input type="text" name="username" id="Susername" placeholder="User Name" class="ghinhandata" />
+            <div class="auth-field">
+                <input type="text" name="username" id="Susername" placeholder="Username" class="ghinhandata" />
             </div>
-            <div class="divghinhandata">
+            <div class="auth-field">
                 <input type="text" name="usermail" id="Suseremail" placeholder="Email" class="ghinhandata" />
             </div>
-            <div class="divghinhandata">
+            <div class="auth-field">
                 <input type="password" name="password" id="Spassword" placeholder="Password" class="ghinhandata" />
             </div>
-            <div class="divghinhandata">
+            <div class="auth-field">
                 <input type="password" name="cpassword" id="Scpassword" placeholder="Confirm password" class="ghinhandata" />
             </div>
-            <div class="divghinhandata">
-                <input type="submit" value="Sign up and Log in" name="submit" class="buttonlogin" style="text-align:center" id="btnSL" />
+            <div class="auth-field">
+                <input type="submit" value="Sign up and Log in" name="submit" class="btn-login" style="text-align:center" id="btnSL" />
             </div>
-            <div class="divstatus">
+            <div class="auth-status">
                 <p id="status1"></p>
             </div>
         </form>
@@ -68,12 +65,13 @@
             <button class="tablinks" onclick="openCity(event, 'Paris')">Points</button>
             <button class="tablinks" onclick="openCity(event, 'Seoul')">Chat</button>
             <button class="tablinks" onclick="openCity(event, 'Tokyo')">Rank</button>
-            <button class="Logout" style="float:right;color:white" onclick="logout()">Log out</button>
+            <button class="logout" style="float:right;color:white" onclick="logout()">Log out</button>
         </div>
         <div id="London" class="tabcontent">
             <form action="/submitfile" method="post" enctype="multipart/form-data">
                 <div>
-                    <h4 style="font-family:'Leelawadee UI';" id="nowuser"></h4>
+                    <h4 style="font-family:'Leelawadee UI';" id="nowuser" name="nowuser"></h4>
+                    <input type="text" id="idnowuser" name="idnowuser" readonly=true></input>
                 </div>
                 <div class="head_topic">
                     <div>
@@ -93,17 +91,12 @@
                     </div>
                     <div style="text-align:left;font-size:14px">
                         <h4>Testcase 1: (30%)</h4>
-                        <p id="pa_result1">
-
-                        </p>
+                        <p id="pa_result1"></p>
                         <h4>Testcase 2: (70%)</h4>
-                        <p id="pa_result2">
-
-                        </p>
-                        <h3 id="Point">Point: 0</h3>
+                        <p id="pa_result2"></p>
+                        <h4 id="Point">Point: 0</h4>
                         <p id="Fault">Fault: None</p>
                     </div>
-
                 </div>
             </form>
             <div style="float:right" id="view_result">

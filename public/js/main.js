@@ -12,6 +12,7 @@ $("#form_login").hide(2000);
 $("#form_signup").hide(2000);
 $("#form_submit").show(1000);
 $("#nowuser").text('Welcome ' + $("#username").val());
+$("#idnowuser").val('Now User: '+$("#username").val());
 });
 socket.on('already_authenticated', function(data) {
 $("#status").text('');
@@ -20,9 +21,6 @@ $("#form_signup").hide(0);
 $("#form_submit").show(0);
 $("#nowuser").text('Welcome ' + data.username);
 });
-socket.on("get_point", function(data) {
-$("#pa_result").text(data);
-});
 socket.on("Exist this account", function(data) {
 alert('This account is existence !');
 });
@@ -30,6 +28,13 @@ socket.on("signup_successfully", function(data) {
 alert('Sign up successfully !');
 $("#form_signup").hide(2000);
 $("#form_submit").show(1000);
+});
+socket.on("your_result",function(data){
+if(data[2]==null) data[2]='None';
+$("#pa_result1").text(data[0]);
+$("#pa_result2").text(data[1]);
+$("#Fault").text('Fault: '+data[2]);
+$("#Point").text('Point: '+data[3]);
 });
 $(document).ready(function() {
 // by default, load form_login first
@@ -84,7 +89,7 @@ $("#btnSL").click(function() {
     }
 });
 // compiler testing, show result
-$("#view_result").click(function() {
+$("#btn_view_result").click(function() {
     socket.emit("wait_for_point", $("#username").val());
 });
 $("#send_file").click(function() {

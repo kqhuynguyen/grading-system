@@ -1,6 +1,2 @@
 node_modules/
 sessions/
-# Ignore everything in this directory
-*
-# Except this file
-!.gitignore

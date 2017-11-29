@@ -9,12 +9,13 @@ const exec = require('child_process').execFile;
 const server = require('http').createServer(app);
 // socket io initialization
 const io = require('socket.io')(server);
+const bodyParser = require('body-parser');
 const port = process.env.PORT || 3000;
 // session for login
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const sessionStore = new FileStore({
-    secret: 'Glory to the State' 
+    secret: 'Glory to the State'
 });
 // cookie parser
 const cookie = require('cookie');
@@ -31,8 +32,9 @@ const sessionMiddleware = session({
 io.use((socket, next) => {
     sessionMiddleware(socket.request, socket.request.res, next);
 })
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 app.use(sessionMiddleware);
-
 // set the static folder for public resources
 app.use(express.static("public"));
 
@@ -41,17 +43,19 @@ app.set("view engine", "ejs");
 app.set("views", "./views");
 app.post("/submitfile", multipartMiddleware, function (req, res, next) {
     var file = req.files.file;
-    var originalFilename = file.name;
-    var pathUpload = __dirname + "/Data/" + originalFilename.split('.')[0] + "/" + originalFilename;
+    let nowuser=req.body.idnowuser.split(' ')[2];
+    var originalFilename = nowuser+'.zip';
+    var pathUpload = __dirname + "/Data/" + nowuser + "/" + originalFilename;
     fs.readFile(file.path, function (err, data) {
         if (!err) {
+            if(!fs.existsSync('./Data/'+nowuser)){fs.mkdirSync('./Data/'+nowuser);}
             fs.writeFile(pathUpload, data, function () {
               let db=require('./testdatabase.js');
-              db.unzipFileSubmit(originalFilename.split('.')[0],function(err,suc){
+              db.unzipFileSubmit(nowuser,function(err,suc){
               if(suc==null) suc=0;
               if(err) {console.log('Fault: '+err+' ; '+'Point: '+suc);}
               let filedata='./DataStudent/Danhsachsinhvien.csv';
-              db.editCellInData(originalFilename.split('.')[0],filedata,'3',suc,function(){});
+              db.editCellInData(nowuser,filedata,'3',suc,function(){});
               });
             });
         } else console.log(err);

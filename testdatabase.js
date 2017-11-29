@@ -268,9 +268,23 @@ module.exports = {
         let fs = require('fs');
         fs.readdir(temp, function(err, files) {
             let copymove = require('./copymove.js');
-            copymove.moveFile(temp + '\\' + files[0], source, function() {
+            copymove.moveFile(temp + '/' + files[0], source, function() {
                 onsuccess();
             });
+        });
+    },
+    creatfolderforStudent: function(source) {
+        let linereader = require('line-reader');
+        let fs = require('fs');
+        linereader.eachLine(source, function(line, last) {
+            let separate = line.split(',');
+            if (separate[0] != 'Id') {
+                fs.mkdirSync('./Data/' + separate[0]);
+                fs.mkdirSync('./Data/' + separate[0] + '/temp');
+                fs.writeFile('./Data/' + separate[0] + '/demo.txt', 'Student :' + separate[0], function(err) {
+                    if (err) console.log(err);
+                });
+            }
         });
     }
 }
