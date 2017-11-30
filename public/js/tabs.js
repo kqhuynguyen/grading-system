@@ -29,4 +29,6 @@ function logout() {
     $("#pa_result").text('');
     $("#btn_view_result").hide();
     $("#status").text("");
+    $('.background').removeClass('zoomed-in');
+    $('.background').removeClass('blurred');
 }
