@@ -3,7 +3,7 @@ module.exports = {
         let fs = require('fs');
         let xmlReader = require('xml2js');
         let xmlParser = new xmlReader.Parser();
-        let sourceCpp = __dirname + '/Data/' + id + '/submit' + timesSubmit + '/';
+        let sourceCpp = __dirname + '\\Data\\' + id + '\\submit' + timesSubmit + '\\';
         fs.readFile(sourceCpp + 'project.xml', 'utf8', function(err, data) {
             if (err) throw err;
             let strSumFile = '';
@@ -32,7 +32,7 @@ module.exports = {
         });
     },
     runExeFile: function(id, times_submit, onsuccess) {
-        let sourceCpp = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/';
+        let sourceCpp = __dirname + '\\Data\\' + id + '\\submit' + times_submit + '\\build\\';
         let childProcess = require('child_process');
         setTimeout(function() {
             let newprocess = require('child_process');
@@ -57,11 +57,11 @@ module.exports = {
 
     grading: function(id, times_submit, numtestcase, success) {
         // checkpoint exe compare lec and stu output to get score
-        let checkPoint = __dirname + '/checkPoint.exe';
+        let checkPoint = __dirname + '\\checkPoint.exe';
         // lecturer output
-        let lecturerOutput = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/result' + numtestcase + '.txt';
+        let lecturerOutput = __dirname + '\\Data\\' + id + '\\submit' + times_submit + '\\build\\result' + numtestcase + '.txt';
         // student output
-        let studentOutput = __dirname + '/Data/' + id + '/submit' + times_submit + '/build/output.txt';
+        let studentOutput = __dirname + '\\Data\\' + id + '\\submit' + times_submit + '\\build\\output.txt';
 
         let childProcess = require('child_process');
         // COMMAND: checkpoint lecOutput stuOutput
