@@ -17,7 +17,7 @@
 
 <body>
     <div class="auth-container" id="form_login">
-            <div class="auth-header">LOG IN</div>
+        <div class="auth-header">LOG IN</div>
         <form action="javascript:void(0);">
             <div class="auth-field">
                 <input type="text" name="username" id="username" placeholder="Username" class="ghinhandata" />
@@ -35,7 +35,7 @@
         <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>
     </div>
     <div class="auth-container" id="form_signup">
-            <div class="auth-header">SIGN UP</div>
+        <div class="auth-header">SIGN UP</div>
         <form action="javascript:void(0);">
             <div class="auth-field">
                 <input type="text" name="username" id="Susername" placeholder="Username" class="ghinhandata" />
@@ -71,18 +71,23 @@
             <form action="/submitfile" method="post" enctype="multipart/form-data">
                 <div>
                     <h4 style="font-family:'Leelawadee UI';" id="nowuser" name="nowuser"></h4>
-                    <input type="text" id="idnowuser" name="idnowuser" readonly=true></input>
+                    <input type="text" id="idnowuser" name="idnowuser" readonly=true />
                 </div>
                 <div class="head_topic">
-                    <div>
-                        <h3> Topic</h3>
-                    </div>
-                    <div>
-                        <p><b><u>Đề bài:</u><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
-                    </div>
+                    <h3> Topic</h3>
                 </div>
+
+                <div id="topicList">
+                    <button class="topicAr" id="Topic1" onclick="">Chủ đề 1</button>
+                    <button class="topicAr" id="Topic2" onclick="">Chủ đề 2</button>
+                    <button class="topicAr" id="Topic3" onclick="">Chủ đề 3</button>
+                </div>
+                <div>
+                    <p><b><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
+                </div>
+
                 <div class="side_submit">
-                    <input type="file" id="file" name="file" style="content:'Main file'"></input><br>
+                    <input type="file" id="file" name="file" style="content:'Main file'" /><br>
                     <input class="subpro" type="submit" id="send_file" onclick="" />
                 </div>
                 <div class="side_result">

@@ -5,6 +5,8 @@
 
 #define EPSILON 0.000001
 
+// COMMAND LINE: rank <Student list> <rank Index> <increase(1)/decrease(0)>
+// rank index is the attribute to rank student
 template <typename T> struct node {
   node<T> *link;
   T data;
@@ -106,6 +108,50 @@ template <typename T> int loadCSV(char **argv, node<T> *&accounts) {
   return accountIndex;
 }
 
+///
+/// MERGE SORT---------------------------------------------
+///
+bool lCompare(student A, student B, char rankIndex, char increase) {
+  // rankIndex: 0-id, 1-name, 2-timesSubmit, 3-grade, 4-mail
+  if (increase == '0') {
+    if (rankIndex == '0') {
+      if (A.id.compare(B.id) >= 0)
+        return true;
+    } else if (rankIndex == '1') {
+      if (A.name.compare(B.name) >= 0)
+        return true;
+    } else if (rankIndex == '2') {
+      if (A.timesSubmit - B.timesSubmit >= 0)
+        return true;
+    } else if (rankIndex == '3') {
+      if (A.grade - B.grade >= 0)
+        return true;
+    } else if (rankIndex == '4') {
+      if (A.mail.compare(B.mail) >= 0)
+        return true;
+    }
+    return false;
+  } else {
+    if (rankIndex == '0') {
+      if (A.id.compare(B.id) >= 0)
+        return false;
+    } else if (rankIndex == '1') {
+      if (A.name.compare(B.name) >= 0)
+        return false;
+    } else if (rankIndex == '2') {
+      if (A.timesSubmit - B.timesSubmit >= 0)
+        return false;
+    } else if (rankIndex == '3') {
+      if (A.grade - B.grade >= 0)
+        return false;
+    } else if (rankIndex == '4') {
+      if (A.mail.compare(B.mail) >= 0)
+        return false;
+    }
+    return true;
+  }
+}
+
 template <typename T> void Divide(node<T> *&list, node<T> *&list2) {
   node<T> *temp = list->link;
   node<T> *middle = list;
@@ -120,11 +166,12 @@ template <typename T> void Divide(node<T> *&list, node<T> *&list2) {
   middle->link = NULL;
 }
 
-template <typename T> void Merge(node<T> *&list, node<T> *&list2) {
+template <typename T>
+void Merge(node<T> *&list, node<T> *&list2, char rankIndex, char increase) {
   node<T> *lastSorted = new node<T>();
   node<T> *combine = lastSorted;
   while (list && list2) {
-    if (list->data >= list2->data) {
+    if (lCompare(list->data, list2->data, rankIndex, increase)) {
       lastSorted->link = list;
       lastSorted = list;
       list = list->link;
@@ -143,32 +190,36 @@ template <typename T> void Merge(node<T> *&list, node<T> *&list2) {
   list = combine->link;
 }
 
-template <typename T> void RMergeSort(node<T> *&list) {
+template <typename T>
+void RMergeSort(node<T> *&list, char rankIndex, char increase) {
   if (list && list->link) {
     node<T> *list2;
     Divide(list, list2);
-    RMergeSort(list);
-    RMergeSort(list2);
-    Merge(list, list2);
+    RMergeSort(list, rankIndex, increase);
+    RMergeSort(list2, rankIndex, increase);
+    Merge(list, list2, rankIndex, increase);
   }
 }
 
-template <typename T> node<T> *MergeSort(node<T> *&head, int size) {
-  RMergeSort(head);
+template <typename T>
+node<T> *MergeSort(node<T> *&head, char rankIndex, char increase) {
+  RMergeSort(head, rankIndex, increase);
   return head;
 }
 
 int main(int argc, char **argv) {
+  // linked list storing all account info
   node<student> *accounts = new node<student>();
   int size = loadCSV(argv, accounts);
 
-  node<student> *print = MergeSort(accounts->link, size);
+  // ranking from greatest to smallest grade
+  node<student> *print = MergeSort(accounts->link, argv[2][0], argv[3][0]);
   node<student> *temp = print;
 
-  std::cout << std::left << std::setw(10) << "ID" << std::setw(10)
-              << "Name" << std::setw(10) << "Times"
-              << std::setw(10) << "Grade" << std::setw(10) << "Email"
-              << std::endl;
+  // print result to file
+  std::cout << std::left << std::setw(10) << "ID" << std::setw(10) << "Name"
+            << std::setw(10) << "Times" << std::setw(10) << "Grade"
+            << std::setw(10) << "Email" << std::endl;
   while (temp) {
     temp->data.print();
     temp = temp->link;
