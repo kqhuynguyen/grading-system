@@ -16,7 +16,7 @@ template <typename T> struct node {
   }
   node<T>() { link = NULL; }
   ~node() {}
-  void Get(T newData) { this->data = newData; }
+  void Set(T newData) { this->data = newData; }
 };
 
 class student {
@@ -30,21 +30,12 @@ public:
   ~student(){};
   void operator=(student you) {
     this->id = you.id;
-    this->name = you.name;
     this->timesSubmit = you.timesSubmit;
     this->grade = you.grade;
-    this->mail = you.mail;
-  }
-  bool operator>=(student you) {
-    if (this->grade - you.grade <= EPSILON)
-      return false;
-    return true;
   }
   void print() {
     std::cout << std::left << std::setw(10) << this->id << std::setw(10)
-              << this->name << std::setw(10) << this->timesSubmit
-              << std::setw(10) << this->grade << std::setw(10) << this->mail
-              << std::endl;
+              << this->timesSubmit << std::setw(10) << this->grade << std::endl;
   }
 };
 template <typename T> int loadCSV(char **argv, node<T> *&accounts) {
@@ -80,17 +71,13 @@ template <typename T> int loadCSV(char **argv, node<T> *&accounts) {
           if (studentInfo == 0)
             me.id = temp;
           else if (studentInfo == 1)
-            me.name = temp;
-          else if (studentInfo == 2)
             me.timesSubmit = std::stoi(temp);
-          else if (studentInfo == 3)
-            me.grade = std::stof(temp);
           temp = "";
           studentInfo++;
         }
         count++;
       }
-      me.mail = temp;
+      me.grade = std::stof(temp);
       // reset temp string to blank, ready to contains next line character
       temp = "";
       count = 0;
@@ -118,16 +105,10 @@ bool lCompare(student A, student B, char rankIndex, char increase) {
       if (A.id.compare(B.id) >= 0)
         return true;
     } else if (rankIndex == '1') {
-      if (A.name.compare(B.name) >= 0)
-        return true;
-    } else if (rankIndex == '2') {
       if (A.timesSubmit - B.timesSubmit >= 0)
         return true;
-    } else if (rankIndex == '3') {
-      if (A.grade - B.grade >= 0)
-        return true;
-    } else if (rankIndex == '4') {
-      if (A.mail.compare(B.mail) >= 0)
+    } else if (rankIndex == '2') {
+      if (A.grade - B.grade >= EPSILON)
         return true;
     }
     return false;
@@ -136,16 +117,10 @@ bool lCompare(student A, student B, char rankIndex, char increase) {
       if (A.id.compare(B.id) >= 0)
         return false;
     } else if (rankIndex == '1') {
-      if (A.name.compare(B.name) >= 0)
-        return false;
-    } else if (rankIndex == '2') {
       if (A.timesSubmit - B.timesSubmit >= 0)
         return false;
-    } else if (rankIndex == '3') {
-      if (A.grade - B.grade >= 0)
-        return false;
-    } else if (rankIndex == '4') {
-      if (A.mail.compare(B.mail) >= 0)
+    } else if (rankIndex == '2') {
+      if (A.grade - B.grade >= EPSILON)
         return false;
     }
     return true;
@@ -217,9 +192,8 @@ int main(int argc, char **argv) {
   node<student> *temp = print;
 
   // print result to file
-  std::cout << std::left << std::setw(10) << "ID" << std::setw(10) << "Name"
-            << std::setw(10) << "Times" << std::setw(10) << "Grade"
-            << std::setw(10) << "Email" << std::endl;
+  std::cout << std::left << std::setw(10) << "ID" << std::setw(10) << "Times"
+            << std::setw(10) << "Grade" << std::endl;
   while (temp) {
     temp->data.print();
     temp = temp->link;

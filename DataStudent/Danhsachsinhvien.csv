@@ -1,13 +1,13 @@
-Id,Name,TimesSubmit,LastPoint,Email
-1611111,John Lee,5,0,jonhlee@gmail.com
-1612222,Jacob,0,0,jacob@gmail.com
-1613333,Eward,0,0,eward@gmail.com
-1614444,Bella,0,0,bella@gmail.com
-1615555,Cristana,0,0,cristana@gmail.com
-1616666,Michel,0,0,michel@gmail.com
-1617777,Peter,0,0,peter@gmail.com
-1618888,Jenifer,0,0,jenifer@gmail.com
-1619999,William,0,0,william@gmail.com
-admin,admin,0,0,admin@gmail.com
-ilogin,ilogin,0,0,ilogin@gmail.com
-steven,steven,0,0,steven@gmail.com
+Id,Name,Email
+1611111,Jonh Lee,jonhlee@gmail.com
+1612222,Jacob,jacob@gmail.com
+1613333,Eward,eward@gmail.com
+1614444,Bella,bella@gmail.com
+1615555,Cristana,cristana@gmail.com
+1616666,Michel,michel@gmail.com
+1617777,Peter,peter@gmail.com
+1618888,Jenifer,jenifer@gmail.com
+1619999,William,william@gmail.com
+admin,admin,admin@gmail.com
+ilogin,ilogin,ilogin@gmail.com
+steven,steven,steven@gmail.com

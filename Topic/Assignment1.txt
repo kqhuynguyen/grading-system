@@ -1,0 +1,5 @@
+﻿Đề bài:
+Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: 
+tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.
+File input.txt có dạng: 12.45 78.16 45.89 100.23 ..............
+File output.txt có dạng: 263.73 100.23 12.45 59.1285 

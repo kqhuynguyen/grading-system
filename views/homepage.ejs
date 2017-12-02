@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/main.css">    
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/tabs.css">
+    <link rel="stylesheet" href="css/main.css">
     <title>Login Page</title>
     <script src="jquery.js"></script>
     <script src="socket.io/socket.io.js"></script>
@@ -19,25 +20,8 @@
 <body>
     <div class="background">
     </div>
-    <div class="auth-container" id="form_login">
-        <div class="auth-header">LOG IN</div>
-        <form action="javascript:void(0);">
-            <div class="auth-field">
-                <input type="text" name="username" id="username" placeholder="Username" class="ghinhandata" />
-            </div>
-            <div class="auth-field">
-                <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata" />
-            </div>
-            <div class="auth-field">
-                <input type="submit" value="Log in" name="submit" class="btn-login" style="text-align:center" id="btnlogin" />
-            </div>
-            <div class="auth-status">
-                <p id="status"></p>
-            </div>
-        </form>
-        <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>
-    </div>
-    <div class="auth-container" id="form_signup">
+    
+    <div class="auth-container" id="form-signup">
         <div class="auth-header">SIGN UP</div>
         <form action="javascript:void(0);">
             <div class="auth-field">
@@ -62,59 +46,96 @@
         <div class="auth-footer"> Already have an account? <a class="auth-link" id="login-link">Log in!</a></div>
 
     </div>
-    <div id="form_submit">
+    <div class="auth-container" id="form-login">
+        <div class="auth-header">LOG IN</div>
+        <form action="javascript:void(0);">
+            <div class="auth-field">
+                <input type="text" name="username" id="username" placeholder="Username" class="ghinhandata" />
+            </div>
+            <div class="auth-field">
+                <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata" />
+            </div>
+            <div class="auth-field">
+                <input type="submit" value="Log in" name="submit" class="btn-login" style="text-align:center" id="btnlogin" />
+            </div>
+            <div class="auth-status">
+                <p id="status"></p>
+            </div>
+        </form>
+        <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>
+    </div>
+    <div id="form-submit">
         <div class="tab">
             <button class="tablinks" onclick="openCity(event, 'London')">Submit</button>
-            <button class="tablinks" onclick="openCity(event, 'Paris')">Points</button>
+            <button class="tablinks" onclick="openCity(event, 'Paris')" id="tabHistory">Points</button>
             <button class="tablinks" onclick="openCity(event, 'Seoul')">Chat</button>
             <button class="tablinks" onclick="openCity(event, 'Tokyo')">Rank</button>
             <button class="logout" style="float:right;color:white" onclick="logout()">Log out</button>
         </div>
         <div id="London" class="tabcontent">
             <form action="/submitfile" method="post" enctype="multipart/form-data">
-                <div>
+                <div style="width:45%">
                     <h4 style="font-family:'Leelawadee UI';" id="nowuser" name="nowuser"></h4>
-                    <input type="text" id="idnowuser" name="idnowuser" readonly=true />
+                    <input type="hidden" id="idnowuser" name="idnowuser" readonly=true></input>
+                    <input type="hidden" id="nowtopic" name="nowtopic" readonly=true></input>
                 </div>
+                <div style="height:50%;width:45%;float:left">
+                <fieldset style="height:100%;width:100%">
+                <legend>Submit</legend>
                 <div class="head_topic">
-                    <h3> Topic</h3>
+                    <p style="display:inline;font-size:23px"><b>Topic: </b></p>
+                    <select id="selectedTopic">
+                      <option value="0" selected="selected">Chọn Topic</option>
+                      <option value="1">Topic 1</option>
+                      <option value="2">Topic 2</option>
+                    </select>
                 </div>
-
-                <div id="topicList">
-                    <button class="topicAr" id="Topic1" onclick="">Chủ đề 1</button>
-                    <button class="topicAr" id="Topic2" onclick="">Chủ đề 2</button>
-                    <button class="topicAr" id="Topic3" onclick="">Chủ đề 3</button>
+                <div style="height:100px;width:100%;overflow:scroll">
+                     <p id="contentTopic"><b><i></i></b></p>
                 </div>
-                <div>
-                    <p><b><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
-                </div>
-
-                <div class="side_submit">
-                    <input type="file" id="file" name="file" style="content:'Main file'" /><br>
+                <div style="width:100%;float:right">
+                    <input type="file" id="file" name="file" style="content:'Main file'"></input><br>
                     <input class="subpro" type="submit" id="send_file" onclick="" />
                 </div>
-                <div class="side_result">
-                    <div>
-                        <h4>Result</h4>
-                    </div>
-                    <div style="text-align:left;font-size:14px">
-                        <h4>Testcase 1: (30%)</h4>
-                        <p id="pa_result1"></p>
-                        <h4>Testcase 2: (70%)</h4>
-                        <p id="pa_result2"></p>
-                        <h4 id="Point">Point: 0</h4>
-                        <p id="Fault">Fault: None</p>
-                    </div>
-                </div>
+              </fieldset>
+            </div>
+              <div style="text-align:left;font-size:23px;height:50%;width:45%;float:right;display:inline">
+                  <fieldset>
+                  <legend>Result</Legend>
+                  <fieldset>
+                  <legend>Topic Result</Legend>
+                  <div id="pa_result" style="height:120px;width:100%;border:1px solid #ccc;font:16px/26px Georgia,Garamond,Serif;overflow:scroll;"></div>
+                  </fieldset>
+                  <fieldset>
+                  <legend>Error</Legend>
+                  <p id="Error" style="height:80px;width:100%;border:1px solid #ccc;font:16px/26px Georgia,Garamond,Serif;overflow:scroll;"></p>
+                  </fieldset>
+                  <h4 id="Point">Point: 0</h4>
+                  </fieldset>
+              </div>
             </form>
             <div style="float:right" id="view_result">
                 <button id="btn_view_result">Xem kết quả</button>
             </div>
         </div>
         <div id="Paris" class="tabcontent">
+            <fieldset style="width:50%">
+            <legend>History Table</legend>
             <div id="scorePoint">
-
+            <table id="historyTable">
+              <thead>
+              <tr>
+                <th>Time</th>
+                <th>Point</th>
+                <th>Error</th>
+              </tr>
+             </thead>
+              <tbody>
+              <tr><td>D-M-Y H:M:S</td><td>Empty</td><td>Empty</td></tr>
+             </tbody>
+            </table>
             </div>
+          </fieldset>
         </div>
         <div id="Tokyo" class="tabcontent">
             <div id="rank">

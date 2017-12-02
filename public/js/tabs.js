@@ -23,9 +23,9 @@ function logout() {
     let socket = io();
     Cookies.remove('auth');
     socket.emit("logout");
-    $("#form_login").show(1000);
+    $("#form-login").show(1000);
     $("#password").val('');
-    $("#form_submit").hide(2000);
+    $("#form-submit").hide(2000);
     $("#pa_result").text('');
     $("#btn_view_result").hide();
     $("#status").text("");
