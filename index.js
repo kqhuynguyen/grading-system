@@ -29,6 +29,12 @@ const sessionMiddleware = session({
     store: sessionStore,
     secret: 'Glory to the State'
 });
+let LecturerFolder=__dirname+'/Lecturer';
+let TopicFile=LecturerFolder+'/'+'Topic.csv';
+let TopicFolder=__dirname+'/Topic';
+let DataFolder=__dirname+'/Data';
+let PrefixOfHistotySubmitFile='history';
+let linereader=require('line-reader');
 io.use((socket, next) => {
     sessionMiddleware(socket.request, socket.request.res, next);
 })
@@ -42,22 +48,25 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.post("/submitfile", multipartMiddleware, function (req, res, next) {
-    var file = req.files.file;
+    let file = req.files.file;
     let nowuser=req.body.idnowuser.split(' ')[2];
-    var originalFilename = nowuser+'.zip';
-    var pathUpload = __dirname + "/Data/" + nowuser + "/" + originalFilename;
+    let numtopic=req.body.nowtopic;
     fs.readFile(file.path, function (err, data) {
-        if (!err) {
-            if(!fs.existsSync('./Data/'+nowuser)){fs.mkdirSync('./Data/'+nowuser);}
-            fs.writeFile(pathUpload, data, function () {
-              let db=require('./testdatabase.js');
-              db.unzipFileSubmit(nowuser,function(err,suc){
-              if(suc==null) suc=0;
-              if(err) {console.log('Fault: '+err+' ; '+'Point: '+suc);}
-              let filedata='./DataStudent/Danhsachsinhvien.csv';
-              db.editCellInData(nowuser,filedata,'3',suc,function(){});
+      if (!err) {
+          if(!fs.existsSync('./Data/'+nowuser)){fs.mkdirSync('./Data/'+nowuser);}
+          if(!fs.existsSync('./Data/'+nowuser+'/topic'+numtopic)) {fs.mkdirSync('./Data/'+nowuser+'/topic'+numtopic);}
+          dataobj.GetTimesSubmitOfStudent(nowuser,numtopic,function(times_submit){
+            console.log(times_submit);
+            let originalFilename = 'submit'+(Number(times_submit)+1)+'.zip';
+            //console.log(originalFilename);
+            let pathUpload ='./Data/' + nowuser + '/topic'+numtopic+'/' + originalFilename;
+            fs.writeFile(pathUpload, data, function (err) {
+              if(err) console.log(err);
+              dataobj.unzipFileSubmit(nowuser,numtopic,times_submit,function(){
+
+                });
               });
-            });
+          });
         } else console.log(err);
     });
 });
@@ -70,8 +79,6 @@ app.get("/", function (req, res) {
 server.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });
-
-
 io.on("connection", function (socket) {
     console.log("Connection found: " + socket.id);
 
@@ -120,11 +127,12 @@ io.on("connection", function (socket) {
                 console.log(error);
             });
     });
-    socket.on("wait_for_point", function (id) {
+    socket.on("wait_for_point", function (infosubmit) {
         let db=require('./testdatabase.js');
-        db.getFileResult(id,function(result1,result2,result3,point){
-          let result=new Array(result1,result2,result3,point);
-          socket.emit("your_result",result);
+        db.getListWeightOfTopic(infosubmit[1],function(arrnum,arrweight){
+          db.getFileResult(infosubmit[0],infosubmit[1],arrnum,function(SetResult){
+            socket.emit("your_result",SetResult);
+          });
         });
     });
     socket.on("signup", function (data) {
@@ -151,5 +159,22 @@ io.on("connection", function (socket) {
             socket.request.session.destroy();
             console.log('logged out');
         });
-    })
+    });
+    socket.on("Choose_Topic",function(numtopic){
+      dataobj.getCellInData(numtopic,TopicFile,1,function(nametopic){
+        let contentTopic=fs.readFileSync(TopicFolder+'/'+nametopic+'.txt','utf8');
+        socket.emit("Your_Topic",contentTopic);
+        });
+    });
+    socket.on("get_history_table",function(data){
+      let filehistory=DataFolder+'/'+data[0]+'/topic'+data[1]+'/'+PrefixOfHistotySubmitFile+'.csv';
+      let historyTable=[];
+      linereader.eachLine(filehistory,function(line,last){
+        let separate=line.split(',');
+        historyTable.push(separate);
+        if(last){
+          socket.emit('Your_history_table',historyTable);
+        }
+      });
+    });
 });
