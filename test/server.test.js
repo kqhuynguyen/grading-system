@@ -12,7 +12,7 @@ const async = require('async');
 // fake user for testing. Also need to add an entry in Topic1.csv and Account.csv
 const userId = '__test';
 const topic = '1';
-const numberOfUser = 3;
+const numberOfUser = 50;
 // seeder array to store fake users
 let seeders = [];
 
@@ -25,13 +25,31 @@ before((done) => {
     for (let i = 0; i < numberOfUser; ++i) {
         seeders.push(`${userId}${i},0,0`);
     }
-    fse.appendFile(topicPath, seeders.join('\n') + '\n', 'utf-8', (err) => {
+    let dataPath = path.join(`${__dirname}`, '../Data/.');    
+    fse.readdir(dataPath, (err, files) => {
         if (err) {
             console.log(err);
-            return done(err);
+            done(err);
         }
-        done();
-    });
+        let testFiles = files.filter(name => /^\_\_test.+/.test(name));
+        async.each(testFiles, (file, callback) => {
+            fse.remove(path.join(dataPath, file))
+            .then(() => {
+                callback();
+            })
+            .catch((e) => {
+                callback(e);
+            });
+        }, () => {
+            fse.appendFile(topicPath, seeders.join('\n') + '\n', 'utf-8', (err) => {
+                if (err) {
+                    console.log(err);
+                    return done(err);
+                }
+                done();
+            });
+        })
+    })
 });
 after((done) => {
     let topicPath = path.join(`${__dirname}`, '../SumaryPoint/Topic1.csv');
@@ -80,32 +98,32 @@ describe('POST /submitfile', function () {
             });
     });
 
-    // it('Should send numberOfUser requests in parallel and get 200 OK', function(done) {
-    //     this.timeout(30000);
-    //     let requestsArray = [];
-    //     for (let i = 0; i < numberOfUser; ++i) {
-    //         requestsArray.push((callback) => {
-    //             chai.request(server)
-    //                 .post('/submitfile')
-    //                 .field('idnowuser', `Now user: ${userId}${i}`)
-    //                 .field('nowtopic', topic)
-    //                 .attach("file", `${__dirname}/resources/submit1.zip`, 'file')
-    //                 .then((res) => {
-    //                     expect(res).to.have.status(200);
-    //                     callback(null, true);
-    //                 })
-    //                 .catch(err => {
-    //                     callback(err);
-    //                 })
-    //         });
-    //     }
+    it(`Should send ${numberOfUser} requests in parallel and get 200 OK`, function(done) {
+        this.timeout(30000);
+        let requestsArray = [];
+        for (let i = 1; i < numberOfUser; ++i) {
+            requestsArray.push((callback) => {
+                chai.request(server)
+                    .post('/submitfile')
+                    .field('idnowuser', `Now user: ${userId}${i}`)
+                    .field('nowtopic', topic)
+                    .attach("file", `${__dirname}/resources/submit1.zip`, 'file')
+                    .then((res) => {
+                        expect(res).to.have.status(200);
+                        callback(null, true);
+                    })
+                    .catch(err => {
+                        callback(err);
+                    })
+            });
+        }
         
-    //     // numberOfUser requests
-    //     async.parallel(requestsArray, (err, results) => {
-    //         if (err) {
-    //             return done(err);
-    //         }
-    //         done();
-    //     });
-    // });
+        // numberOfUser requests
+        async.parallel(requestsArray, (err, results) => {
+            if (err) {
+                return done(err);
+            }
+            done();
+        });
+    });
 });

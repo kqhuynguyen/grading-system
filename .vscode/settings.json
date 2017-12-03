@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "xlocale": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "string": "cpp"
     }
 }

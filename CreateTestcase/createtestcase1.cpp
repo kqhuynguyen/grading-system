@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 using namespace std;
+
 void random_float(int n)
 {
 	for (int i = 1; i <= n; ++i)
@@ -12,10 +13,10 @@ void random_float(int n)
 		else cout << temp << " ";
 	}
 }
-int main()
+
+int main(int argc, char* argv[])
 {
-	srand(time(NULL));int n;
-	cin>>n;
-	random_float(n);
+	srand(time(NULL));
+	random_float(stoi(argv[1]));
 	return 0;
 }

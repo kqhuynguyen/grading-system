@@ -36,7 +36,13 @@ const xml2js = require('xml2js');
 // helper for resurively go through each directory
 const walk = require('walk');
 // child process
-const { exec } = require('child_process');
+const {
+    exec,
+    execFile,
+    spawn,
+} = require('child_process');
+// async
+const async = require('async');
 let LecturerFolder = __dirname + '/Lecturer';
 let TopicFile = LecturerFolder + '/' + 'Topic.csv';
 let TopicFolder = __dirname + '/Topic';
@@ -76,12 +82,14 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
         let extractDir = path.join(__dirname, './Data/', nowuser, '/topic' + numtopic, submitName);
 
         // extract the uploaded file
-        extract(req.files.file.path, {dir: extractDir}, (err) => {
+        extract(req.files.file.path, {
+            dir: extractDir
+        }, (err) => {
             if (err) {
                 console.log(err);
                 return res.status(400).send();
-            } 
-            
+            }
+
             // build an xml to describe the project's structure
             let xmlObject = {
                 header_files: [],
@@ -89,7 +97,9 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
                 main: null
             }
             // walk through each file and build an object that represents the xml
-            let walker = walk.walk(extractDir, { followLinks: false});
+            let walker = walk.walk(extractDir, {
+                followLinks: false
+            });
             walker.on('file', (root, stats, next) => {
                 let fileName = stats.name;
                 let fullPath = path.join(root, fileName);
@@ -117,25 +127,53 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
                         res.status(400).send();
                     }
 
-                    
+
                     // xml built. Now we compile the application 
                     fse.mkdirSync(`${extractDir}/build`);
+                    /* THIS IS WHERE WE SPAWN A CHILD PROCESS */
                     exec(`g++ ${xmlObject.source_files.join(' ')} ${xmlObject.main} -o build/${nowuser}`, {
-                        cwd: extractDir,
-                        timeout: 3000
+                        cwd: extractDir
                     }, (err, stdout, stderr) => {
                         if (err) {
                             console.log(err);
                             return res.status(400).send();
                         }
 
-                        // app compiled. Now we run it on our test cases
-
-                        res.send();                    
+                        // app compiled. Now for the time being, we generate test cases
+                        fse.readJSON(`./Testcase/SetTestcase${numtopic}.json`)
+                            .then((data) => {
+                                let createTestCasePath = path.join('CreateTestcase', 'createtestcase1.exe');
+                                let runTestCasePath = path.join('RunTestcase', 'runtestcase1.exe');
+                                async.eachOf(data, (item, index, cb) => {
+                                    let inputPath = path.join(extractDir, `input${index + 1}.txt`);
+                                    let outputPath = path.join(extractDir, `output${index + 1}.txt`);
+                                    exec(`${createTestCasePath} ${item.num} > ${inputPath} && ${runTestCasePath} < ${inputPath} > ${outputPath}`, {
+                                            cwd: __dirname
+                                        },
+                                        (err, stdout, stderr) => {
+                                            if (err) {
+                                                return cb(err);
+                                            }
+                                            cb();
+                                        });
+                                }, (err) => {
+                                    if (err) {
+                                        console.log(err);
+                                        res.status(400).send();
+                                    }
+                                    
+                                    // Test cases built. Now we run the student's program and get their output
+                                    
+                                    res.send();
+                                })
+                            })
+                            .catch((e) => {
+                                console.log(e);
+                                res.status(400).send();
+                            })
                     });
                 });
             });
-            
         });
     });
 });
