@@ -141,7 +141,7 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
 
             (xmlObject, callback) => {
                 fse.mkdirSync(`${extractDir}/build`);
-                exec(`g++ ${xmlObject.source_files.join(' ')} ${xmlObject.main} -o build/${nowuser}`, {
+                exec(`g++ --std=c++11 ${xmlObject.source_files.join(' ')} ${xmlObject.main} -o build/${nowuser}`, {
                     cwd: extractDir
                 }, (err, stdout, stderr) => {
                     if (err) {
@@ -161,7 +161,7 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
                 });
             },
 
-            // lol
+            // createTestCase
             (data, callback) => {
                 let createTestCasePath = path.join('CreateTestcase', 'createtestcase1.exe');
                 let runTestCasePath = path.join('RunTestcase', 'runtestcase1.exe');
@@ -228,11 +228,11 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
                 fse.readFile(accountsDir, 'utf-8', (err, data) => {
                     csv.parse(data, (err, data) => {
                         if (err) {
+                            console.log(err);
                             return callback(err);
                         }
                         let userIndex = data.findIndex((element) => element[0] === nowuser);
                         data[userIndex][1]++;
-                        data[userIndex][2] = totalScore;
                         csv.stringify(data, (err, data) => {
                             fse.writeFile(accountsDir, data, 'utf-8', (err, data) => {
                                 if (err) {
