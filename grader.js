@@ -51,7 +51,7 @@ class Grader {
         walker.on('end', () => {
             let builder = new xml2js.Builder();
             let xml = builder.buildObject(xmlObject);
-            fse.writeFile(path.join(this.extractDir, 'project.xml'), xml, 'utf-8', (err) => {
+            fse.outputFile(path.join(this.extractDir, 'project.xml'), xml, 'utf-8', (err) => {
                 if (err) {
                     return callback(err);
                 }
@@ -182,7 +182,7 @@ class Grader {
                 let userIndex = data.findIndex((element) => element[0] === this.userId);
                 data[userIndex][1]++;
                 csv.stringify(data, (err, data) => {
-                    fse.writeFile(accountsDir, data, 'utf-8', (err, data) => {
+                    fse.outputFile(accountsDir, data, 'utf-8', (err, data) => {
                         if (err) {
                             return callback(err);
                         }

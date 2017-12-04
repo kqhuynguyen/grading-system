@@ -64,7 +64,7 @@
         </form>
         <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>
     </div>
-    <div id="form-submit">
+    <div id="submit-form">
         <div class="tab">
             <button class="tablinks" onclick="openCity(event, 'London')">Submit</button>
             <button class="tablinks" onclick="openCity(event, 'Paris')" id="tabHistory">Points</button>
@@ -73,7 +73,7 @@
             <button class="logout" style="float:right;color:white" onclick="logout()">Log out</button>
         </div>
         <div id="London" class="tabcontent">
-            <form action="/submitfile" method="post" enctype="multipart/form-data">
+            <form id="file-submit" onsubmit="return false;" action="/submitfile" method="post" enctype="multipart/form-data">
                 <div style="width:45%">
                     <h4 style="font-family:'Leelawadee UI';" id="nowuser" name="nowuser"></h4>
                     <input type="hidden" id="idnowuser" name="idnowuser" readonly=true></input>

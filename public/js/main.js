@@ -39,6 +39,7 @@ $(() => {
         $('.background').addClass('blurred');
         $("#status").text('');
         $("#nowuser").text('Welcome ' + data.username);
+        $("#idnowuser").val('Now User: ' + data.username);
     });
     socket.on("Exist this account", function (data) {
         alert('This account is existence !');
@@ -148,5 +149,22 @@ $(() => {
         let data = new Array($("#username").val(), $("#selectedTopic").val());
         socket.emit("get_history_table", data);
     });
+
+    $('#file-submit').submit(function () {
+        let formData = new FormData();
+        formData.append('idnowuser', $('#idnowuser').val());
+        formData.append('file', $('#file')[0].files[0]);
+        formData.append('nowtopic', $('#nowtopic'))
+        $.ajax({
+            url: '/submitfile',
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(data){
+              alert(formData);
+            }
+        });
+    })
 
 });
