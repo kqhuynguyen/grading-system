@@ -1,5 +1,7 @@
 // get the server for testing
 const server = require('./../index');
+// csv
+const csv = require('csv');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -12,7 +14,7 @@ const async = require('async');
 // fake user for testing. Also need to add an entry in Topic1.csv and Account.csv
 const userId = '__test';
 const topic = '1';
-const numberOfUser = 50;
+const numberOfUser = 6;
 // seeder array to store fake users
 let seeders = [];
 
@@ -41,7 +43,7 @@ before((done) => {
                 callback(e);
             });
         }, () => {
-            fse.appendFile(topicPath, seeders.join('\n') + '\n', 'utf-8', (err) => {
+            fse.appendFile(topicPath, seeders.join('\r\n') + '\r\n', 'utf-8', (err) => {
                 if (err) {
                     console.log(err);
                     return done(err);
@@ -83,7 +85,10 @@ describe('POST /submitfile', function () {
     // otherwise a 400 respond is received
 
     it('Should send a single request and get 200 OK', function(done) {
+        // this test should not take longer than 100000
         this.timeout(10000);
+
+        // make a request to the server that succeeds
         chai.request(server)
             .post('/submitfile')
             .field('idnowuser', `Now user: ${userId}0`)
@@ -91,17 +96,36 @@ describe('POST /submitfile', function () {
             .attach("file", `${__dirname}/resources/submit1.zip`, 'file')
             .then((res) => {
                 expect(res).to.have.status(200);
-                done();
+                return fse.readdir(`Data/${userId}0/topic1/submit1`);
+            })
+            .then((files) => {
+                expect(files).to.include.members(['build', 'submit', 'project.xml']);
+                return fse.readdir(`Data/${userId}0/topic1/submit1/build`);
+            })
+            .then((files) => {
+                expect(files).to.include.members(['input1.txt', 'input2.txt', 'output1.txt', 'output2.txt', 'studentOutput1.txt', 'studentOutput2.txt', `${userId}0.exe`]);
+                return fse.readFile('SumaryPoint/Topic1.csv');                                
+            })
+            .then((data) => {
+                csv.parse(data, (err, data) => {
+                    if (err) {
+                        throw err;
+                    }
+                    let userData = data.find((element) => element[0] === `${userId}0`);
+                    expect(userData[1]).to.equal("1");
+                    done();
+                });
             })
             .catch(err => {
                 done(err);
             });
     });
 
+    // make numberOfUsers requests to server that succeeds
     it(`Should send ${numberOfUser} requests in parallel and get 200 OK`, function(done) {
         this.timeout(30000);
         let requestsArray = [];
-        for (let i = 1; i < numberOfUser; ++i) {
+        for (let i = 0; i < numberOfUser; ++i) {
             requestsArray.push((callback) => {
                 chai.request(server)
                     .post('/submitfile')

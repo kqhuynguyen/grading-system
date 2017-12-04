@@ -11,6 +11,8 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 3000;
+// csv parser
+const csv = require('csv');
 // session for login
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
@@ -81,99 +83,175 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
         let submitName = 'submit' + (Number(times_submit) + 1);
         let extractDir = path.join(__dirname, './Data/', nowuser, '/topic' + numtopic, submitName);
 
-        // extract the uploaded file
-        extract(req.files.file.path, {
-            dir: extractDir
-        }, (err) => {
+
+        async.waterfall([
+
+            // extract file            
+            (callback) => {
+                extract(req.files.file.path, {
+                    dir: extractDir
+                }, (err) => {
+                    if (err) {
+                        return callback(err);
+                    }
+                    callback();
+                });
+            },
+
+            // build xml
+            (callback) => {
+                // build an xml to describe the project's structure
+                let xmlObject = {
+                    header_files: [],
+                    source_files: [],
+                    main: null
+                }
+                // walk through each file and build an object that represents the xml
+                let walker = walk.walk(extractDir, {
+                    followLinks: false
+                });
+                walker.on('file', (root, stats, next) => {
+                    let fileName = stats.name;
+                    let fullPath = path.join(root, fileName);
+                    let fileExtension = fileName.split('.').pop();
+                    if (fileExtension === 'h') {
+                        xmlObject.header_files.push(fullPath);
+                    } else if (fileExtension === 'cpp') {
+                        if (fileName === 'main.cpp') {
+                            xmlObject.main = fullPath;
+                        } else {
+                            xmlObject.source_files.push(fullPath);
+                        }
+                    }
+                    next();
+                });
+                // walk completed and now we build the xmlObject (optional)
+                walker.on('end', () => {
+                    let builder = new xml2js.Builder();
+                    let xml = builder.buildObject(xmlObject);
+                    fse.writeFile(path.join(extractDir, 'project.xml'), xml, 'utf-8', (err) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        callback(null, xmlObject);
+                    });
+                });
+            },
+
+
+            (xmlObject, callback) => {
+                fse.mkdirSync(`${extractDir}/build`);
+                exec(`g++ ${xmlObject.source_files.join(' ')} ${xmlObject.main} -o build/${nowuser}`, {
+                    cwd: extractDir
+                }, (err, stdout, stderr) => {
+                    if (err) {
+                        return callback(err);
+                    }
+                    callback();
+                });
+            },
+
+            // read test case settings
+            (callback) => {
+                fse.readJSON(`./Testcase/SetTestcase${numtopic}.json`, (err, data) => {
+                    if (err) {
+                        return callback(err);
+                    }
+                    callback(null, data);
+                });
+            },
+
+            // lol
+            (data, callback) => {
+                let createTestCasePath = path.join('CreateTestcase', 'createtestcase1.exe');
+                let runTestCasePath = path.join('RunTestcase', 'runtestcase1.exe');
+                let buildDir = path.join(extractDir, 'build');
+                let totalScore = 0;
+                async.eachOf(data, (item, index, cb) => {
+                        let inputPath = path.join(buildDir, `input${index + 1}.txt`);
+                        let outputPath = path.join(buildDir, `output${index + 1}.txt`);
+                        // create the sample output for each of the generated input and store them in /build
+                        async.waterfall([
+                            // Create sample outputs and store them in /build
+                            (cb) => {
+                                exec(`${createTestCasePath} ${item.num} > ${inputPath} && ${runTestCasePath} < ${inputPath} > ${outputPath}`, {
+                                        cwd: __dirname
+                                    },
+                                    (err, stdout, stderr) => {
+                                        if (err) {
+                                            return cb(err);
+                                        }
+                                        cb();
+                                    });
+                            },
+                            (cb) => {
+                                // Test cases built. Now we run the student's program and get their output
+                                exec(`${nowuser}.exe < input${index + 1}.txt > studentOutput${index + 1}.txt`, {
+                                        cwd: buildDir
+                                    },
+                                    (err, stdout, stderr) => {
+                                        if (err) {
+                                            return cb(err);
+                                        }
+                                        cb();
+                                    });
+                            },
+                            (cb) => {
+                                // get total score
+                                let checkPointExe = path.join(__dirname, 'CheckPoint', 'checkpoint1.exe');
+                                exec(`${checkPointExe} ${buildDir}/output${index + 1}.txt ${buildDir}/studentOutput${index + 1}.txt`, (err, stdout, stderr) => {
+                                    if (err) {
+                                        return cb(err);
+                                    }
+                                    totalScore += item.weight * Number(stdout);
+                                    cb();
+                                });
+                            },
+
+                        ], (err) => {
+                            if (err) {
+                                return cb(err);
+                            }
+                            cb(err);
+                        });
+                    },
+                    (err) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        callback(null, totalScore);
+                    });
+            },
+            (totalScore, callback) => {
+                // update changes to csv
+                let accountsDir = path.join(__dirname, 'SumaryPoint', 'Topic1.csv');
+                fse.readFile(accountsDir, 'utf-8', (err, data) => {
+                    csv.parse(data, (err, data) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        let userIndex = data.findIndex((element) => element[0] === nowuser);
+                        data[userIndex][1]++;
+                        data[userIndex][2] = totalScore;
+                        csv.stringify(data, (err, data) => {
+                            fse.writeFile(accountsDir, data, 'utf-8', (err, data) => {
+                                if (err) {
+                                    return callback(err);
+                                }
+                                callback();
+                            });
+                        });
+
+                    });
+                });
+            }
+        ], (err) => {
             if (err) {
                 console.log(err);
                 return res.status(400).send();
             }
-
-            // build an xml to describe the project's structure
-            let xmlObject = {
-                header_files: [],
-                source_files: [],
-                main: null
-            }
-            // walk through each file and build an object that represents the xml
-            let walker = walk.walk(extractDir, {
-                followLinks: false
-            });
-            walker.on('file', (root, stats, next) => {
-                let fileName = stats.name;
-                let fullPath = path.join(root, fileName);
-                let fileExtension = fileName.split('.').pop();
-                if (fileExtension === 'h') {
-                    xmlObject.header_files.push(fullPath);
-                } else if (fileExtension === 'cpp') {
-                    if (fileName === 'main.cpp') {
-                        xmlObject.main = fullPath;
-                    } else {
-                        xmlObject.source_files.push(fullPath);
-                    }
-                }
-                next();
-            });
-
-            // walk completed and now we build the xmlObject (optional)
-            walker.on('end', () => {
-                let builder = new xml2js.Builder();
-                let xml = builder.buildObject(xmlObject);
-                // write to project.xml
-                fse.writeFile(path.join(extractDir, 'project.xml'), xml, 'utf-8', (err) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(400).send();
-                    }
-
-
-                    // xml built. Now we compile the application 
-                    fse.mkdirSync(`${extractDir}/build`);
-                    /* THIS IS WHERE WE SPAWN A CHILD PROCESS */
-                    exec(`g++ ${xmlObject.source_files.join(' ')} ${xmlObject.main} -o build/${nowuser}`, {
-                        cwd: extractDir
-                    }, (err, stdout, stderr) => {
-                        if (err) {
-                            console.log(err);
-                            return res.status(400).send();
-                        }
-
-                        // app compiled. Now for the time being, we generate test cases
-                        fse.readJSON(`./Testcase/SetTestcase${numtopic}.json`)
-                            .then((data) => {
-                                let createTestCasePath = path.join('CreateTestcase', 'createtestcase1.exe');
-                                let runTestCasePath = path.join('RunTestcase', 'runtestcase1.exe');
-                                async.eachOf(data, (item, index, cb) => {
-                                    let inputPath = path.join(extractDir, `input${index + 1}.txt`);
-                                    let outputPath = path.join(extractDir, `output${index + 1}.txt`);
-                                    exec(`${createTestCasePath} ${item.num} > ${inputPath} && ${runTestCasePath} < ${inputPath} > ${outputPath}`, {
-                                            cwd: __dirname
-                                        },
-                                        (err, stdout, stderr) => {
-                                            if (err) {
-                                                return cb(err);
-                                            }
-                                            cb();
-                                        });
-                                }, (err) => {
-                                    if (err) {
-                                        console.log(err);
-                                        res.status(400).send();
-                                    }
-                                    
-                                    // Test cases built. Now we run the student's program and get their output
-                                    
-                                    res.send();
-                                })
-                            })
-                            .catch((e) => {
-                                console.log(e);
-                                res.status(400).send();
-                            })
-                    });
-                });
-            });
+            // send 200 OK if there are no errors
+            res.send();
         });
     });
 });
