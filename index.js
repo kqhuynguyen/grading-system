@@ -4,7 +4,10 @@ const multipart = require("connect-multiparty");
 const multipartMiddleware = multipart();
 const fse = require("fs-extra");
 const path = require('path');
+
+// dataobj for working with data
 const dataobj = require("./testdatabase.js");
+const Grader = require('./grader.js');
 // server created from Express's requests handler
 const server = require('http').createServer(app);
 // socket io initialization
@@ -69,21 +72,20 @@ app.set("views", "./views");
 
 app.post("/submitfile", multipartMiddleware, function (req, res, next) {
     let file = req.files.file;
-    let nowuser = req.body.idnowuser.split(' ')[2];
-    let numtopic = req.body.nowtopic;
+    let userId = req.body.idnowuser.split(' ')[2];
+    let topicId = req.body.nowtopic;
 
-    if (!fse.existsSync(`./Data/${nowuser}`)) {
-        fse.mkdirSync(`./Data/${nowuser}`);
+    if (!fse.existsSync(`./Data/${userId}`)) {
+        fse.mkdirSync(`./Data/${userId}`);
     }
-    if (!fse.existsSync(`./Data/${nowuser}/topic${numtopic}`)) {
-        fse.mkdirSync(`./Data/${nowuser}/topic${numtopic}`);
+    if (!fse.existsSync(`./Data/${userId}/topic${topicId}`)) {
+        fse.mkdirSync(`./Data/${userId}/topic${topicId}`);
     }
     // generate the index of submit
-    dataobj.GetTimesSubmitOfStudent(nowuser, numtopic, function (times_submit) {
-        let submitName = 'submit' + (Number(times_submit) + 1);
-        let extractDir = path.join(__dirname, './Data/', nowuser, '/topic' + numtopic, submitName);
-
-
+    dataobj.GetTimesSubmitOfStudent(userId, topicId, function (times_submit) {
+        let submissionId = 'submit' + (Number(times_submit) + 1);
+        let extractDir = path.join(__dirname, './Data/', userId, '/topic' + topicId, submissionId);
+        let grader = new Grader(userId, topicId, submissionId);
         async.waterfall([
 
             // extract file            
@@ -98,152 +100,29 @@ app.post("/submitfile", multipartMiddleware, function (req, res, next) {
                 });
             },
 
-            // build xml
+            // build the xml. The call back will receive an xmlObject
             (callback) => {
-                // build an xml to describe the project's structure
-                let xmlObject = {
-                    header_files: [],
-                    source_files: [],
-                    main: null
-                }
-                // walk through each file and build an object that represents the xml
-                let walker = walk.walk(extractDir, {
-                    followLinks: false
-                });
-                walker.on('file', (root, stats, next) => {
-                    let fileName = stats.name;
-                    let fullPath = path.join(root, fileName);
-                    let fileExtension = fileName.split('.').pop();
-                    if (fileExtension === 'h') {
-                        xmlObject.header_files.push(fullPath);
-                    } else if (fileExtension === 'cpp') {
-                        if (fileName === 'main.cpp') {
-                            xmlObject.main = fullPath;
-                        } else {
-                            xmlObject.source_files.push(fullPath);
-                        }
-                    }
-                    next();
-                });
-                // walk completed and now we build the xmlObject (optional)
-                walker.on('end', () => {
-                    let builder = new xml2js.Builder();
-                    let xml = builder.buildObject(xmlObject);
-                    fse.writeFile(path.join(extractDir, 'project.xml'), xml, 'utf-8', (err) => {
-                        if (err) {
-                            return callback(err);
-                        }
-                        callback(null, xmlObject);
-                    });
-                });
+                grader.buildXml(callback);            
             },
 
-
-            (xmlObject, callback) => {
-                fse.mkdirSync(`${extractDir}/build`);
-                exec(`g++ --std=c++11 ${xmlObject.source_files.join(' ')} ${xmlObject.main} -o build/${nowuser}`, {
-                    cwd: extractDir
-                }, (err, stdout, stderr) => {
-                    if (err) {
-                        return callback(err);
-                    }
-                    callback();
-                });
-            },
-
-            // read test case settings
+            // save the xml. 
             (callback) => {
-                fse.readJSON(`./Testcase/SetTestcase${numtopic}.json`, (err, data) => {
-                    if (err) {
-                        return callback(err);
-                    }
-                    callback(null, data);
-                });
+                grader.saveXml(callback);
             },
 
-            // createTestCase
-            (data, callback) => {
-                let createTestCasePath = path.join('CreateTestcase', 'createtestcase1.exe');
-                let runTestCasePath = path.join('RunTestcase', 'runtestcase1.exe');
-                let buildDir = path.join(extractDir, 'build');
-                let totalScore = 0;
-                async.eachOf(data, (item, index, cb) => {
-                        let inputPath = path.join(buildDir, `input${index + 1}.txt`);
-                        let outputPath = path.join(buildDir, `output${index + 1}.txt`);
-                        // create the sample output for each of the generated input and store them in /build
-                        async.waterfall([
-                            // Create sample outputs and store them in /build
-                            (cb) => {
-                                exec(`${createTestCasePath} ${item.num} > ${inputPath} && ${runTestCasePath} < ${inputPath} > ${outputPath}`, {
-                                        cwd: __dirname
-                                    },
-                                    (err, stdout, stderr) => {
-                                        if (err) {
-                                            return cb(err);
-                                        }
-                                        cb();
-                                    });
-                            },
-                            (cb) => {
-                                // Test cases built. Now we run the student's program and get their output
-                                exec(`${nowuser}.exe < input${index + 1}.txt > studentOutput${index + 1}.txt`, {
-                                        cwd: buildDir
-                                    },
-                                    (err, stdout, stderr) => {
-                                        if (err) {
-                                            return cb(err);
-                                        }
-                                        cb();
-                                    });
-                            },
-                            (cb) => {
-                                // get total score
-                                let checkPointExe = path.join(__dirname, 'CheckPoint', 'checkpoint1.exe');
-                                exec(`${checkPointExe} ${buildDir}/output${index + 1}.txt ${buildDir}/studentOutput${index + 1}.txt`, (err, stdout, stderr) => {
-                                    if (err) {
-                                        return cb(err);
-                                    }
-                                    totalScore += item.weight * Number(stdout);
-                                    cb();
-                                });
-                            },
-
-                        ], (err) => {
-                            if (err) {
-                                return cb(err);
-                            }
-                            cb(err);
-                        });
-                    },
-                    (err) => {
-                        if (err) {
-                            return callback(err);
-                        }
-                        callback(null, totalScore);
-                    });
+            // read test case settings. The call back will receive the settings object.
+            (callback) => {
+                grader.readTestcaseSettings(callback);
             },
-            (totalScore, callback) => {
-                // update changes to csv
-                let accountsDir = path.join(__dirname, 'SumaryPoint', 'Topic1.csv');
-                fse.readFile(accountsDir, 'utf-8', (err, data) => {
-                    csv.parse(data, (err, data) => {
-                        if (err) {
-                            console.log(err);
-                            return callback(err);
-                        }
-                        let userIndex = data.findIndex((element) => element[0] === nowuser);
-                        data[userIndex][1]++;
-                        csv.stringify(data, (err, data) => {
-                            fse.writeFile(accountsDir, data, 'utf-8', (err, data) => {
-                                if (err) {
-                                    return callback(err);
-                                }
-                                callback();
-                            });
-                        });
 
-                    });
-                });
+            // grade. The call back will receive the total score from the test case
+            (callback) => {
+                grader.grade(callback);
+            },
+
+            // update user data
+            (callback) => {
+                grader.updateUser(callback);
             }
         ], (err) => {
             if (err) {
