@@ -1,20 +1,48 @@
+let PrefixOfInputFile='input';
+let PrefixOfResultFile='result';
+let PrefixOfOutputFile='output';
+let PrefixOfHistotySubmitFile='history';
+let PrefixOfTopicFile='Topic';
+let PrefixOfRankTopicFile='rank';
+let StudentInputFile='input.txt';
+let DataStudentFolder=__dirname+'/DataStudent';
+let DataStudentFile=DataStudentFolder+'/Danhsachsinhvien.csv';
+let SumaryPointFolder=__dirname+'/SumaryPoint';
+let DataFolder=__dirname+'/Data';
+let PublicFolder=__dirname+'/public';
+let TempFolderExecute=__dirname+'/Data/execute_exe';
+let CreateTestcaseFolder=__dirname+'/CreateTestcase';
+let RunTestcaseFolder=__dirname+'/RunTestcase';
+let CheckPointFolder=__dirname+'/CheckPoint';
+let LecturerFolder=__dirname+'/Lecturer';
+let TestcaseFolder=__dirname+'/Testcase';
+let StudentOutputFile='output.txt';
+let StudentErrorFile='error.txt';
+let AccountFile=DataStudentFolder+'/'+'Account.csv';
+let XmlFile='project.xml';
+let TopicFile=LecturerFolder+'/'+'Topic.csv';
+let LibStdFile='libstdc++-6.dll';
+let fs=require('fs');
+let linereader=require('line-reader');
+let copyandmove=require('./copymove.js');
+let childprocess=require('child_process');
+let extract = require('extract-zip');
+let xmlcompile=require('./xml_compile.js');
+let xmlbuild = require('xmlbuilder');
+let datetime=require('node-datetime');
 function return_timesubmit(timesSubmit) {
     return timesSubmit;
 }
-
-function getTimesSubmitOfStudent(username, onsuccess) {
-    let lineReader = require('line-reader');
-    let fileData = __dirname + "/DataStudent/Danhsachsinhvien.csv";
-    lineReader.eachLine(fileData, function(line, last) {
+function getTimesSubmitOfStudent(username,numtopic,onsuccess) {
+    let fileData =SumaryPointFolder+'/Topic'+numtopic+'.csv';
+    linereader.eachLine(fileData, function(line, last) {
         let seperate = line.split(',');
-        if (seperate[0] == username) onsuccess(seperate[2]);
+        if (seperate[0] == username) onsuccess(seperate[1]);
     });
 }
-
 function editOneCell(id, source, collum, newcell, success) {
     let filedata = '';
-    let lineread = require('line-reader');
-    lineread.eachLine(source, function(line, last) {
+    linereader.eachLine(source, function(line, last) {
         let arrline = line.split(',');
         if (arrline[0] != id) filedata += line + '\r\n';
         else {
@@ -34,9 +62,8 @@ function editOneCell(id, source, collum, newcell, success) {
 module.exports = {
     checkLoginCSV: function(username, password) {
         return new Promise((resolve, reject) => {
-            let lineReader = require('line-reader');
-            let fileData = __dirname + "/DataStudent/Account.csv";
-            lineReader.eachLine(fileData, function(line, last) {
+            let fileData =AccountFile;
+            linereader.eachLine(fileData, function(line, last) {
                 if (line.split(',')[0] == username) {
                     if (line.split(',')[1] == password) {
                         return resolve(line);
@@ -46,31 +73,27 @@ module.exports = {
             });
         });
     },
-    waitForSecond: function(ms, afterWait) {
+    waitForSecond: function(ms) {
         let start = new Date().getTime();
         let end = start;
         while (end < start + ms) {
             end = new Date().getTime();
         }
-        afterWait();
     },
-    GetTimesSubmitOfStudent: function(username, onsuccess) {
-        getTimesSubmitOfStudent(username, function(times_submit) {
+    GetTimesSubmitOfStudent: function(username,numtopic, onsuccess) {
+        getTimesSubmitOfStudent(username,numtopic,function(times_submit) {
             onsuccess(times_submit);
         });
     },
     addNewAccount: function(data) {
-        let append = require('fs');
-        console.log('in function ' + data);
-        let account_source = __dirname + '/DataStudent/Account.csv';
-        append.appendFile(account_source, data, function(err, success) {
+        let account_source =AccountFile;
+        fs.appendFile(account_source, data, function(err, success) {
             if (err) console.log(err);
         });
     },
     checkAccountExistence: function(data, exist) {
-        let line_reader = require('line-reader');
-        let file_data = __dirname + "/DataStudent/Account.csv";
-        line_reader.eachLine(file_data, function(line, last) {
+        let file_data =AccountFile;
+        linereader.eachLine(file_data, function(line, last) {
             let seperate = line.split(',');
             if (seperate[0] == data) exist(seperate[0]);
             if (last) {
@@ -79,212 +102,302 @@ module.exports = {
             }
         });
     },
-    unzipFileSubmit: function(id, result) {
-        let db = require('./testdatabase.js');
-        db.GetTimesSubmitOfStudent(id, function(times_submit) {
-            let now_submit = Number(times_submit) + 1;
-            let rename = require('./copymove.js');
-            let oldpath = __dirname + '/Data/' + id + '/' + id + '.zip';
-            let newpath = __dirname + '/Data/' + id + '/submit' + now_submit + '.zip';
-            let tempfolder = __dirname + '/Data/' + id + '/temp';
-            rename.moveFile(oldpath, newpath, function() {
-                let extract = require('extract-zip');
-                extract(newpath, { dir: tempfolder }, function(err) {
-                    if (err) console.log(err);
-                    else {
-                        console.log('extract file successfully !');
-                        let newfolder = __dirname + '/Data/' + id + '/submit' + now_submit;
-                        let sourcefile = __dirname + '/Data/' + id + '/submit' + now_submit;
-                        db.editNameAfterUnzip(tempfolder, sourcefile, function() {
-                            let DataStudent = './DataStudent/Danhsachsinhvien.csv';
-                            db.editCellInData(id, DataStudent, 2, now_submit, function() {
-                                db.createXmlFileFromFolder(id, function() {
-                                    let fs = require('fs');
-                                    let buildFolder = './Data/' + id + '/submit' + now_submit + '/build';
-                                    fs.mkdirSync(buildFolder);
-                                    let sourceCreatetestcase = './public/';
-                                    rename.copyFile(sourceCreatetestcase + 'createtestcase.exe', buildFolder, function() {
-                                        rename.copyFile(sourceCreatetestcase + 'libstdc++-6.dll', buildFolder, function() {
-                                            let createtestcase = require('child_process');
-                                            createtestcase.exec('createtestcase.exe', { cwd: buildFolder }, function(err, stdout, stderr) {
-                                                if (err) console.log(err);
-                                                else {
-                                                    setTimeout(function() {
-                                                        let xmlCompile = require('./xml_compile.js');
-                                                        let sumpoint = 0;
-                                                        xmlCompile.readXmlAndCompile(id, now_submit, function(error, success) {
-                                                            if (error) {
-                                                                result(error, null);
-                                                                fs.unlinkSync(newfolder + '/' + id + '.exe');
-                                                                fs.writeFile(buildFolder + '/fault.txt', error, function(err) {
-                                                                    if (err) console.log(err);
-                                                                });
-                                                            } else {
-                                                                rename.moveFile(newfolder + '/' + id + '.exe', newfolder + '/build/' + id + '.exe', function() {
-                                                                    let tempdir = './Data/execute_exe';
-                                                                    db.copyandrename(buildFolder, 'input1.txt', tempdir, 'input.txt', function() {
-                                                                        xmlCompile.runExeFile(id, now_submit, function(err, success) {
-                                                                            if (err) {
-                                                                                result(err, sumpoint);
-                                                                                fs.writeFile(buildFolder + '/fault.txt', err, function(err2) {
-                                                                                    if (err2) console.log(err2);
-                                                                                });
-                                                                            } else {
-                                                                                xmlCompile.grading(id, now_submit, '1', function(point1) {
-                                                                                    rename.moveFile(buildFolder + '/outputX.txt', buildFolder + '/outputX1.txt', function() {
-                                                                                        sumpoint += 0.3 * Number(point1);
-                                                                                        db.copyandrename(buildFolder, 'input2.txt', tempdir, 'input.txt', function() {
-                                                                                            xmlCompile.runExeFile(id, now_submit, function(err1, success1) {
-                                                                                                if (err1) {
-                                                                                                    result(err1, sumpoint);
-                                                                                                    fs.writeFile(buildFolder + '/fault.txt', err1, function(err3) {
-                                                                                                        if (err3) console.log(err3);
-                                                                                                    });
-                                                                                                } else {
-                                                                                                    xmlCompile.grading(id, now_submit, '2', function(point2) {
-                                                                                                        rename.moveFile(buildFolder + '/outputX.txt', buildFolder + '/outputX2.txt', function() {
-                                                                                                            sumpoint += 0.7 * Number(point2);
-                                                                                                            result(null, sumpoint);
-                                                                                                        });
-                                                                                                    });
-                                                                                                }
-                                                                                            });
-                                                                                        });
-                                                                                    });
-                                                                                });
-                                                                            }
-                                                                        });
-                                                                    });
-                                                                });
-                                                            }
-
-                                                        });
-                                                    }, 2000);
-
-                                                    rename.copyFile(sourceCreatetestcase + 'runtestcase.exe', buildFolder, function() {
-                                                        let runtestcase = require('child_process');
-                                                        runtestcase.exec('runtestcase.exe <input1.txt> result1.txt', { cwd: buildFolder + '/' }, function(err, stdout, stderr) {
-                                                            if (err) console.log(err);
-                                                            else {
-                                                                runtestcase.exec('runtestcase.exe <input2.txt> result2.txt', { cwd: buildFolder + '/' }, function(err, stdout, stderr) {
-                                                                    if (err) console.log(err);
-                                                                    else {
-
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                                    });
-                                                }
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    }
-                });
-            });
-        });
-    },
     editCellInData: function(id, source, collum, newcell, onsuccess) {
         editOneCell(id, source, collum, newcell, function(filedata) {
-            let write = require('fs');
-            write.writeFile('./DataStudent/Danhsachsinhvien.csv', filedata, function(err) {
+            fs.writeFile(source, filedata, function(err) {
                 if (err) console.log(err);
                 else onsuccess();
             });
         });
     },
-    createXmlFileFromFolder: function(id, onsuccess) {
-        let db = require('./testdatabase.js');
-        db.GetTimesSubmitOfStudent(id, function(times_submit) {
-            let desfile = './Data/' + id + '/submit' + times_submit;
-            let fs = require('fs');
-            fs.readdir(desfile, function(err, files) {
-                if (err) console.log(err);
-                let xmlbuild = require('xmlbuilder');
-                let xmlfile = xmlbuild.create('project');
-                for (let i = 0; i < files.length; ++i) {
-                    let separate = files[i].split('.');
-                    if (separate[1] == 'h') {
-                        xmlfile.ele('header_files').txt(files[i]);
-                    } else if (separate[1] == 'cpp' && separate[0] != 'main') {
-                        xmlfile.ele('source_files').txt(files[i]);
-                    } else if (separate[0] == 'main') {
-                        xmlfile.ele('main').txt(files[i]);
-                    }
-                }
-                let data = xmlfile.toString({
-                    pretty: true
-                });
-                let filename = 'project.xml';
-                fs.writeFile(desfile + '/' + filename, data, function(err) {
-                    if (err) console.log(err);
-                    onsuccess();
-                });
-            });
-        });
+
+    copyandrename: function(sourcefolderold, oldname,sourcefoldernew,newname) {
+        let data=fs.readFileSync(sourcefolderold+'/'+oldname);
+        fs.writeFileSync(sourcefoldernew+'/'+newname,data,'utf8');
     },
-    copyandrename: function(filesource, oldname, tempdir, newname, success) {
-        let copymove = require('./copymove.js');
-        copymove.copyFile(filesource + '/' + oldname, tempdir, function() {
-            copymove.moveFile(tempdir + '/' + oldname, filesource + '/' + newname, function() {
-                success();
-            });
-        });
-    },
-    getFileResult: function(id, success) {
-        let db = require('./testdatabase.js');
-        db.GetTimesSubmitOfStudent(id, function(times_submit) {
-            let buildFolder = __dirname + "/Data/" + id + "/submit" + times_submit + '/build';
-            let result1;
-            let result2;
-            let result3;
-            let fs = require('fs');
-            if (fs.existsSync(buildFolder + '/outputX1.txt')) {
-                result1 = fs.readFileSync(buildFolder + '/outputX1.txt', 'utf8');
-            } else result1 = '';
-            if (fs.existsSync(buildFolder + '/outputX2.txt')) {
-                result2 = fs.readFileSync(buildFolder + '/outputX2.txt', 'utf8');
-            } else result2 = '';
-            if (fs.existsSync(buildFolder + '/fault.txt')) {
-                result3 = fs.readFileSync(buildFolder + '/fault.txt', 'utf8');
-            } else result3 = '';
-            let filedata = './DataStudent/Danhsachsinhvien.csv';
-            db.getCellInData(id, filedata, '3', function(point) {
-                success(result1, result2, result3, point);
-            });
-        });
-    },
+    // copyandrename: function(sourcefolder, oldname,newname,success) {
+    //     let data=fs.readFileSync(sourcefolder+'/'+oldname);
+    //     fs.writeFile(sourcefolder+'/'+newname,data,'utf8',function(){
+    //       success();
+    //     });
+    // },
     getCellInData: function(id, source, collum, onsuccess) {
-        let lineread = require('line-reader');
-        lineread.eachLine(source, function(line, last) {
+        linereader.eachLine(source, function(line, last) {
             let separate = line.split(',');
             if (separate[0] == id) { onsuccess(separate[Number(collum)]); }
         });
     },
+
     editNameAfterUnzip:function(temp,source,onsuccess){
-      let fs=require('fs');
       fs.readdir(temp,function(err,files){
-          let copymove=require('./copymove.js');
-          copymove.moveFile(temp+'/'+files[0],source,function(){
+          copyandmove.moveFile(temp+'/'+files[0],source,function(){
             onsuccess();
           });
       });
     },
     creatfolderforStudent:function(source){
-      let linereader=require('line-reader');
-      let fs=require('fs');
       linereader.eachLine(source,function(line,last){
       let separate=line.split(',');
       if(separate[0]!='Id'){
-          fs.mkdirSync('./Data/'+separate[0]);
-          fs.mkdirSync('./Data/'+separate[0]+'/temp');
-          fs.writeFile('./Data/'+separate[0]+'/demo.txt','Student :'+separate[0],function(err){
+          fs.mkdirSync(DataFolder+'/'+separate[0]);
+          fs.mkdirSync(DataFolder+'/'+separate[0]+'/temp');
+          fs.writeFile(DataFolder+'/'+separate[0]+'/demo.txt','Student :'+separate[0],function(err){
           if(err) console.log(err);
           });
         }
       });
+    },
+    getListWeightOfTopic:function(numtopic,onsuccess){
+        let db=require('./testdatabase.js');
+        db.getCellInData(numtopic,TopicFile,'2',function(filetestcase){
+          let arrnum=[];let arrweight=[];
+          linereader.eachLine(TestcaseFolder+'/'+filetestcase+'.txt',function(line,last){
+            let separate1=line.split(' ');
+            for(let i = 0;i<separate1.length;++i){
+            let separate2=separate1[i].split(':');
+            arrnum.push(separate2[0]);arrweight.push(separate2[1]);
+              }
+            if(last) onsuccess(arrnum,arrweight);
+          });
+        });
+    },
+    prepareTestcase:function(id,now_submit,nowtopic,success){
+       let db=require('./testdatabase.js');
+       let builddir=DataFolder+'/'+id+'/topic'+nowtopic+'/submit'+now_submit+'/build';
+       fs.mkdirSync(builddir);
+       db.getListWeightOfTopic(nowtopic,function(arrnum,arrweight){
+         db.getCellInData(nowtopic,TopicFile,'3',function(filecreatetestcase){
+            for(let i = 0;i<arrnum.length;++i){
+              let numtestcasefile=builddir+'/numtestcase'+(i+1)+'.txt'
+              fs.writeFile(numtestcasefile,arrnum[i],function(err){
+                if(err) console.log(err);
+                childprocess.exec(CreateTestcaseFolder+'/'+filecreatetestcase+'.exe'+' <numtestcase'+(i+1)+'.txt> '+PrefixOfInputFile+(i+1)+'.txt',{cwd:builddir},
+              function(err,stdout,stderr){
+                if(err)console.log(err);
+                else{
+                      console.log('CreateTestcase for '+id+' topic '+nowtopic+' Timessubmit '+now_submit+' Successfully !');
+                      fs.unlinkSync(numtestcasefile);
+                      if(i==arrnum.length-1)success(arrnum,arrweight);
+                    }
+                  });
+              });
+            }
+          });
+       });
+    },
+    runTestcase:function(id,numtopic,now_submit,arrnum,success){
+      let db=require('./testdatabase.js');
+      db.getCellInData(numtopic,TopicFile,4,function(nameruntestcasefile){
+        RunTestcaseFolder=__dirname+'/RunTestcase';
+        let runtestcasefile=RunTestcaseFolder+'/'+nameruntestcasefile+'.exe';
+        let folderbuild=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+now_submit+'/build';
+          for(let i=0;i<arrnum.length;++i){
+            childprocess.exec(runtestcasefile+' <'+PrefixOfInputFile+(i+1)+'.txt> '+PrefixOfResultFile+(i+1)+'.txt',{cwd:folderbuild},function(err,stdout,stderr){
+              if(err) console.log(err);
+              else {if(i==arrnum.length-1) success();}
+            });
+          }
+        });
+    },
+    createXmlFileFromFolder: function(id,numtopic,onsuccess) {
+        let db=require('./testdatabase.js');
+        db.GetTimesSubmitOfStudent(id,numtopic,function(times_submit) {
+          let desfile = DataFolder+'/'+ id +'/topic'+numtopic+'/submit'+times_submit;
+          fs.readdir(desfile, function(err, files) {
+            if (err) console.log(err);
+              let xmlfile = xmlbuild.create('project');
+              for (let i = 0; i < files.length; ++i) {
+                let separate = files[i].split('.');
+                if (separate[1] == 'h') {
+                    xmlfile.ele('header_files').txt(files[i]);
+                 } else if (separate[1] == 'cpp' && separate[0] != 'main') {
+                    xmlfile.ele('source_files').txt(files[i]);
+                 } else if (separate[0] == 'main') {
+                    xmlfile.ele('main').txt(files[i]);
+                 }
+                }
+                let data = xmlfile.toString({
+                    pretty: true
+                });
+                let filename =XmlFile;
+                fs.writeFile(desfile + '/' + filename, data, function(err) {
+                    if (err) console.log(err);
+                    else console.log('Create xml file for '+id+' topic '+numtopic+' Timessubmit '+times_submit+' successfully !');
+                    onsuccess(times_submit);
+                });
+            });
+        });
+    },
+    unzipFileSubmit: function(id,numtopic,times_submit,success) {
+      let db=require('./testdatabase.js');let now_submit=Number(times_submit)+1;
+      let filetopic=SumaryPointFolder+'/Topic'+numtopic+'.csv';
+      let newpath =DataFolder+'/'+id+'/topic'+numtopic+'/submit'+now_submit+'.zip';
+      let tempfolder =DataFolder+'/'+id+'/topic'+numtopic+'/temp';
+      if(!fs.existsSync(tempfolder)) fs.mkdirSync(tempfolder);
+        extract(newpath,{ dir: tempfolder}, function(err) {
+          if (err) console.log(err);
+          else {
+          console.log('Extract file for '+id+' topic '+numtopic+' Timessubmit '+times_submit+' successfully !');
+          let newfolder=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+now_submit;
+          db.editNameAfterUnzip(tempfolder,newfolder, function() {
+           let NowTopicFile=SumaryPointFolder+'/Topic'+numtopic+'.csv';
+           db.editCellInData(id, NowTopicFile,1, now_submit, function() {
+            db.prepareTestcase(id,now_submit,numtopic,function(arrnum,arrweight){
+              db.runTestcase(id,numtopic,now_submit,arrnum,function(){
+                db.processProject(id,numtopic,arrnum,arrweight,function(point){
+                  db.editCellInData(id,filetopic,2,point,function(){
+                    let now=datetime.create().format('d-m-Y H:M:S');
+                    let fault='None';
+                    if(fs.existsSync(newfolder+'/build/'+StudentErrorFile)){
+                      fault=fs.readFileSync(newfolder+'/build/'+StudentErrorFile);
+                    }
+                    let infoTimesSubmit=new Array(now,point,fault);
+                    db.AppendFileHistorySubmit(id,numtopic,infoTimesSubmit,function(){
+                      success();
+                                });
+                              });
+                            });
+                          });
+                        });
+                      });
+                  });
+                }
+            });
+    },
+  processProject:function(id,numtopic,arrnum,arrweight,result){
+      let db=require('./testdatabase.js');let point=0;
+      db.getCellInData(numtopic,TopicFile,5,function(filecheckpoint){
+      db.createXmlFileFromFolder(id,numtopic,function(times_submit){
+        xmlcompile.readXmlAndCompile(id,numtopic,times_submit,function(error,success){
+          if(error) db.noteError(id,numtopic,times_submit,'Error In Compile !',function(){result(point);});
+          else{
+            let sourcefolder=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+times_submit+'/build';
+            copyandmove.copyFile(__dirname+'/'+LibStdFile,sourcefolder,function(){
+              for(let i=0;i<arrnum.length;++i){
+                let temp=i+1;
+                fs.mkdirSync(sourcefolder+'/testcase'+temp);
+                let newsource=sourcefolder+'/testcase'+temp;
+                db.copyandrename(sourcefolder,PrefixOfInputFile+temp+'.txt',newsource,PrefixOfInputFile+'.txt');
+              }
+              setTimeout(function(){
+               for(let i=0;i<arrnum.length;++i){
+                 let temp=i+1;
+                 let pointoftest=xmlcompile.grading(id,numtopic,times_submit,filecheckpoint,temp);
+                 point+=Number(pointoftest)*Number(arrweight[i]);
+                 if(i==arrnum.length-1) result(point);
+               }
+              },1500);
+              for(let i=0;i<arrnum.length;++i){
+                let temp=i+1;
+                xmlcompile.runExeFile(id,numtopic,times_submit,temp);
+              }
+            });
+        }
+       });
+     });
+   });
+  },
+    noteError:function(id,numtopic,times_submit,error,success){
+      let folderbuild=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+times_submit+'/build';
+      fs.writeFile(folderbuild+'/'+StudentErrorFile,error,function(err){
+       if(err)console.log(err);
+       else {
+         console.log('Note error for '+id+' topic '+numtopic+' Timessubmit '+times_submit+' successfully !');
+         success();
+       }
+      });
+    },
+    getFileResult:function(id,numtopic,arrnum,success){
+      let db=require('./testdatabase.js');
+      db.GetTimesSubmitOfStudent(id,numtopic,function(now_submit) {
+      let folderbuild=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+now_submit+'/build';
+      let data='';let SetResult=[];
+      for(let i=0;i<arrnum.length;++i){
+        let result='';let temp=i+1;
+        if(fs.existsSync(folderbuild+'/testcase'+temp+'/'+PrefixOfOutputFile+temp+'X.txt')){
+          result=fs.readFileSync(folderbuild+'/testcase'+temp+'/'+PrefixOfOutputFile+temp+'X.txt','utf8');
+        }
+        data+=result+'.';
+      }
+      SetResult.push(data);
+      if(fs.existsSync(folderbuild+'/'+StudentErrorFile)){
+        let err=fs.readFileSync(folderbuild+'/'+StudentErrorFile,'utf8');
+        SetResult.push(err);
+      }else SetResult.push(null);
+      let nowtopicfile=SumaryPointFolder+'/Topic'+numtopic+'.csv';
+      db.getCellInData(id,nowtopicfile,2,function(point){
+        SetResult.push(point);
+        success(SetResult);
+        });
+      });
+    },
+    AppendFileHistorySubmit:function(id,numtopic,infoTimesSubmit,success){
+      let foldernowtopic=DataFolder+'/'+id+'/topic'+numtopic;
+      if(!fs.existsSync(foldernowtopic+'/'+PrefixOfHistotySubmitFile+'.csv')){
+        let header='Time,Point,Error'+'\r\n';
+        fs.writeFileSync(foldernowtopic+'/'+PrefixOfHistotySubmitFile+'.csv',header);
+        }
+      let historyTopic=foldernowtopic+'/'+PrefixOfHistotySubmitFile+'.csv';
+      let newInfoSubmit=infoTimesSubmit[0]+','+infoTimesSubmit[1]+','+infoTimesSubmit[2]+'\r\n';
+      fs.appendFile(historyTopic,newInfoSubmit,function(err){
+        if(err) console.log(err);
+        else {
+          console.log('Append file history for '+id+' topic '+numtopic);
+        }
+      });
+    },
+    GetaLineInCsvFile:function(id,source,onsuccess){
+      linereader.eachLine(source,function(line,last){
+        let separate=line.split(',');
+        if(separate[0]==id){
+          let data=[];
+          for(let i=0;i<separate.length;++i){
+            data.push(separate[i]);
+          }
+          onsuccess(data);
+        }
+      });
+    },
+    RankTopic:function(numtopic,typerank,typesort,success){
+      let db=require('./testdatabase.js');
+      let NowTopicFile=SumaryPointFolder+'/'+PrefixOfTopicFile+numtopic+'.csv';
+      let numStudent=db.getNowNumStudent(DataStudentFile);
+      childprocess.execSync(SumaryPointFolder+'/'+PrefixOfRankTopicFile+'.exe '+PrefixOfTopicFile+numtopic+'.csv '+typerank+' '+typesort+' > rank'+numtopic+'.txt',{cwd:SumaryPointFolder});
+    },
+    getNowNumStudent:function(source){
+      let data=fs.readFileSync(source,'utf8');
+      let arr=data.split('\n');
+      return arr.length-2;
+    },
+    getRankTopic:function(numtopic,typerank,typesort,success){
+      let db=require('./testdatabase.js');
+      if(Number(typerank)>0){
+      db.RankTopic(numtopic,typerank,typesort,function(){});
+      let NowRankTopicFile=SumaryPointFolder+'/'+PrefixOfRankTopicFile+numtopic+'.txt';
+      let rankTable=[];
+      linereader.eachLine(NowRankTopicFile,function(line,last){
+        let seperate=line.split(',');
+        rankTable.push(seperate);
+        if(last) success(rankTable);
+      });
+     }
     }
 }
+
+
+
+    //let now=datetime.create();
+    //let now=datetime.create().format('d-m-Y H:M:S');
+  //  console.log(now);
+    //console.log(time);
+   //let db=require('./testdatabase.js');
+   //db.getRankTopic('1',function(){});
+   //let numStudent=db.getNowNumStudent(DataStudentFile);
+   //console.log('num '+numStudent);
+   //db.AppendFileHistorySubmit('1611111','1','ahihi',function(){});
+  //     db.GetTimesSubmitOfStudent('1611111',1,function(times_submit){
+  //       console.log('times_submit '+times_submit);
+  //     })
+      //db.prepareTestcase('1611111','1','1',function(){
+
+    //  });

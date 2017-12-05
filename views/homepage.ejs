@@ -7,12 +7,13 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&amp;subset=vietnamese" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/tabs.css">
+    <link rel="stylesheet" href="css/main.css">
     <title>Login Page</title>
     <script src="jquery.js"></script>
     <script src="socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="socket.io-file-client.js"></script>
     <script src="js/tabs.js"></script>
-    <script src="js/main.js"></script>
 </head>
 
 <body>
@@ -57,63 +58,158 @@
             </div>
         </form>
         <div class="auth-footer"> Already have an account? <a class="auth-link" id="login-link">Log in!</a></div>
-
     </div>
     <div id="form_submit">
         <div class="tab">
             <button class="tablinks" onclick="openCity(event, 'London')">Submit</button>
-            <button class="tablinks" onclick="openCity(event, 'Paris')">Points</button>
-            <button class="tablinks" onclick="openCity(event, 'Seoul')">Chat</button>
-            <button class="tablinks" onclick="openCity(event, 'Tokyo')">Rank</button>
+            <button class="tablinks" onclick="openCity(event, 'Paris')" id="tabHistory">Points</button>
+            <button class="tablinks" onclick="openCity(event, 'Seoul')" id="chatField">Chat</button>
+            <button class="tablinks" onclick="openCity(event, 'Tokyo')" id="tabRank">Rank</button>
             <button class="logout" style="float:right;color:white" onclick="logout()">Log out</button>
         </div>
+        <div class="head_topic">
+            <p style="display:inline;font-size:23px;color:white"><b>Topic: </b></p>
+            <select id="selectedTopic">
+              <option value="0" selected="selected">Choose Topic</option>
+              <option value="1">Topic 1</option>
+              <option value="2">Topic 2</option>
+            </select>
+        </div>
         <div id="London" class="tabcontent">
-            <form action="/submitfile" method="post" enctype="multipart/form-data">
-                <div>
-                    <h4 style="font-family:'Leelawadee UI';" id="nowuser" name="nowuser"></h4>
-                    <input type="text" id="idnowuser" name="idnowuser" readonly=true></input>
+            <div style="width:45%">
+              <h4 style="font-family:'Leelawadee UI';" id="nowuser" name="nowuser"></h4>
+              <input type="hidden" id="idnowuser" name="idnowuser" readonly=true></input>
+              <input type="hidden" id="nowtopic" name="nowtopic" readonly=true></input>
+            </div>
+                <div style="height:50%;width:45%;float:left">
+                <fieldset style="height:100%;width:100%">
+                <legend><b>Submit</b></legend>
+                <div style="height:100px;width:100%;overflow:scroll">
+                     <p id="contentTopic"><b><i></i></b></p>
                 </div>
-                <div class="head_topic">
-                    <div>
-                        <h3> Topic</h3>
-                    </div>
-                    <div>
-                        <p><b><u>Đề bài:</u><i> Em hãy viết một chương trình đọc vào các số trong file input.txt và tìm 4 giá trị: tổng của dãy số, giá trị lớn nhất, giá trị nhỏ nhất, và số trung bình, sau đó ghi ra file output.txt.</i></b></p>
-                    </div>
+                <div style="width:100%;float:right">
+                  <form id="form" >
+                    <input type="file" id="file" name="file" style="content:'Main file'" multiple></input><br>
+                    <input class="subpro" type="submit" id="send_file" value="Upload" />
+                  </form>
+                  <button id="compilebtn" class="subpro">Compile</buton>
+                  <button id="btn_view_result" class="subpro">View Result</button>
                 </div>
-                <div class="side_submit">
-                    <input type="file" id="file" name="file" style="content:'Main file'"></input><br>
-                    <input class="subpro" type="submit" id="send_file" onclick="" />
-                </div>
-                <div class="side_result">
-                    <div>
-                        <h4>Result</h4>
-                    </div>
-                    <div style="text-align:left;font-size:14px">
-                        <h4>Testcase 1: (30%)</h4>
-                        <p id="pa_result1"></p>
-                        <h4>Testcase 2: (70%)</h4>
-                        <p id="pa_result2"></p>
-                        <h4 id="Point">Point: 0</h4>
-                        <p id="Fault">Fault: None</p>
-                    </div>
-                </div>
-            </form>
-            <div style="float:right" id="view_result">
-                <button id="btn_view_result">Xem kết quả</button>
+              </fieldset>
+            </div>
+              <div style="text-align:left;font-size:23px;height:50%;width:45%;float:right;display:inline">
+                  <fieldset>
+                  <legend><b>Result</b></Legend>
+                  <fieldset>
+                  <legend><b>Topic Result</b></Legend>
+                  <div id="pa_result" style="height:120px;width:100%;border:1px solid #ccc;font:16px/26px Georgia,Garamond,Serif;overflow:scroll;"></div>
+                  </fieldset>
+                  <fieldset>
+                  <legend><b>Error</b></Legend>
+                  <p id="Error" style="height:80px;width:100%;border:1px solid #ccc;font:16px/26px Georgia,Garamond,Serif;overflow:scroll;"></p>
+                  </fieldset>
+                  <h4 id="Point">Point: 0</h4>
+                  </fieldset>
+              </div>
+              <br></br>
+              <div style="text-align:left;font-size:20px;height:50%;width:45%;float:left">
+              <fieldset>
+              <legend><b>Status</b></legend>
+              <div style="width:100%">
+              <p><b>Rule: You will save all files in your project in a folder and zip this folder with extention .zip</b><p>
+              </div>
+              <div style="width:100%">
+              <p id="statusSendFile"><b>Status: </b><p>
+              </div>
+              </fieldset>
             </div>
         </div>
         <div id="Paris" class="tabcontent">
-            <div id="scorePoint">
-
+            <fieldset style="width:45%;float:left">
+            <legend><b>Now User</b></legend>
+            <h4 id='nowaccname'>Account: </h4>
+            <h4 id='nowusername'>User Name: </h4>
+            <h4 id='nowemail'>Email Contact: </h4>
+            </fieldset>
+            <fieldset style="width:45%;float:right">
+            <legend><b>History Table</b></legend>
+            <div id="scorePoint" style="width:100%;height:500px;overflow:auto">
+            <table id="historyTable" style="width:100%">
+              <thead>
+              <tr>
+                <th>Time</th>
+                <th>Point</th>
+                <th>Error</th>
+              </tr>
+             </thead>
+              <tbody>
+              <tr><td>D-M-Y H:M:S</td><td>Empty</td><td>Empty</td></tr>
+             </tbody>
+            </table>
             </div>
+          </fieldset>
         </div>
         <div id="Tokyo" class="tabcontent">
-            <div id="rank">
-
+          <fieldset style="width:30%;float:left;" >
+          <legend><b>Set Type Rank</b></legend>
+          <p style="display:inline;font-size:23px;"><b>Type Rank: </b></p>
+          <select id="selectedTypeRank">
+            <option value="0" selected="selected">Choose type rank</option>
+            <option value="1">Times Submit</option>
+            <option value="2">Point</option>
+          </select>
+          <br></br>
+          <fieldset style="width:60%">
+          <legend><b>Type Sort</b></legend>
+          <div style="width:100%" id="typeSort">
+            <input type="radio" name="gender" value="1"><b>Ascending</b><br>
+            <input type="radio" name="gender" value="0" checked="checked"><b>Descending</b><br>
+          </div>
+          </fieldset>
+          <p style="display:inline;font-size:23px;" id="yourRank"><b>Your Rank: None</b></p>
+          </fieldset>
+          <fieldset style="width:45%;float:right">
+          <legend><b>Rank Table</b></legend>
+            <div id="rank" style="width:100%;height:500px;overflow:auto">
+              <table id="rankTable" style="width:100%">
+                <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>Submiting Times</th>
+                  <th>Point</th>
+                </tr>
+               </thead>
+                <tbody>
+                <tr><td>Empty</td><td>Empty</td><td>Empty</td></tr>
+               </tbody>
+              </table>
             </div>
         </div>
-    </div>
+        <div id="Seoul" class="tabcontent">
+        <fieldset>
+        <legend><b>Forum</b></legend>
+        <div style="width:100%;height:300px;overflow:scroll" id="forumChat">
+        </div>
+        </fieldset>
+        <div style="width:45%;float:left">
+        <fieldset style="width:100%">
+        <legend><b>Message</b></legend>
+        <div style="width:100%;height:100px;overflow:scroll" id="messageChat">
+        <input id="inputMessage" type="text" placeholder="Your Message" class="ghinhandata"></input>
+        <button id="sendMessagebtn" class="subpro">Send</button>
+        </div>
+       </fieldset>
+       </div>
+       <div style="width:45%;float:right">
+        <fieldset style="width:100%">
+        <legend><b>Online</b></legend>
+       <div style="width:100%;height:100px;overflow:scroll" id="listOnlines">
+       </div>
+        </fieldset>
+      </div>
+        </div>
+      </div>
+      <script src="js/main.js"></script>
 </body>
 
 </html>

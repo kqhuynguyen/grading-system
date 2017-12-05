@@ -28,5 +28,8 @@ function logout() {
     $("#form_submit").hide(2000);
     $("#pa_result").text('');
     $("#btn_view_result").hide();
+    $("#compilebtn").hide();
     $("#status").text("");
+    $("#historyTable  tbody > tr").remove();
+    $("#rankTable  tbody > tr").remove();
 }
