@@ -3,6 +3,14 @@
         src: url("https://fonts.googleapis.com/css?family=Roboto:300,400&amp;subset=vietnamese2");
     }
 
+    html {
+        -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+        background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.5)), to(rgba(0, 0, 0, 0.5))), url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) no-repeat center center fixed;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) no-repeat center center fixed;
+        background-size: cover;
+        box-sizing: border-box;
+    }
 
     *,
     *:before,
@@ -21,37 +29,4 @@
     input[type=text],
     input[type=password] {
         font-size: 70%;
-    }
-
-    /* background image & effect */
-    .background {
-        background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.5)), to(rgba(0, 0, 0, 0.5))), url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) no-repeat center center fixed;
-        background: url(https://s-media-cache-ak0.pinimg.com/originals/7c/f2/d9/7cf2d9ff39a68b207173a132d3d3e0db.jpg) no-repeat center center fixed;
-        background-size: cover;
-        background-position: center;
-        position: fixed;
-        z-index: -999;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        -webkit-transition: all 0.5s;
-        transition: all 0.5s;
-    }
-    .background::before {
-        content: "";
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-    .zoomed-in {
-        -webkit-transform: scale(1.2);
-                transform: scale(1.2);
-    }
-    .blurred {
-        -webkit-filter: blur(5px);
-                filter: blur(5px);
     }

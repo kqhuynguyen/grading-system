@@ -23,12 +23,13 @@ function logout() {
     let socket = io();
     Cookies.remove('auth');
     socket.emit("logout");
-    $("#form-login").show(1000);
+    $("#form_login").show(1000);
     $("#password").val('');
-    $("#form-submit").hide(2000);
+    $("#form_submit").hide(2000);
     $("#pa_result").text('');
     $("#btn_view_result").hide();
+    $("#compilebtn").hide();
     $("#status").text("");
-    $('.background').removeClass('zoomed-in');
-    $('.background').removeClass('blurred');
+    $("#historyTable  tbody > tr").remove();
+    $("#rankTable  tbody > tr").remove();
 }

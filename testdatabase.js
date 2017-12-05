@@ -2,8 +2,11 @@ let PrefixOfInputFile='input';
 let PrefixOfResultFile='result';
 let PrefixOfOutputFile='output';
 let PrefixOfHistotySubmitFile='history';
+let PrefixOfTopicFile='Topic';
+let PrefixOfRankTopicFile='rank';
 let StudentInputFile='input.txt';
 let DataStudentFolder=__dirname+'/DataStudent';
+let DataStudentFile=DataStudentFolder+'/Danhsachsinhvien.csv';
 let SumaryPointFolder=__dirname+'/SumaryPoint';
 let DataFolder=__dirname+'/Data';
 let PublicFolder=__dirname+'/public';
@@ -171,7 +174,9 @@ module.exports = {
                 childprocess.exec(CreateTestcaseFolder+'/'+filecreatetestcase+'.exe'+' <numtestcase'+(i+1)+'.txt> '+PrefixOfInputFile+(i+1)+'.txt',{cwd:builddir},
               function(err,stdout,stderr){
                 if(err)console.log(err);
-                else{fs.unlinkSync(numtestcasefile);
+                else{
+                      console.log('CreateTestcase for '+id+' topic '+nowtopic+' Timessubmit '+now_submit+' Successfully !');
+                      fs.unlinkSync(numtestcasefile);
                       if(i==arrnum.length-1)success(arrnum,arrweight);
                     }
                   });
@@ -217,6 +222,7 @@ module.exports = {
                 let filename =XmlFile;
                 fs.writeFile(desfile + '/' + filename, data, function(err) {
                     if (err) console.log(err);
+                    else console.log('Create xml file for '+id+' topic '+numtopic+' Timessubmit '+times_submit+' successfully !');
                     onsuccess(times_submit);
                 });
             });
@@ -231,7 +237,7 @@ module.exports = {
         extract(newpath,{ dir: tempfolder}, function(err) {
           if (err) console.log(err);
           else {
-          console.log('extract file successfully !');
+          console.log('Extract file for '+id+' topic '+numtopic+' Timessubmit '+times_submit+' successfully !');
           let newfolder=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+now_submit;
           db.editNameAfterUnzip(tempfolder,newfolder, function() {
            let NowTopicFile=SumaryPointFolder+'/Topic'+numtopic+'.csv';
@@ -246,7 +252,9 @@ module.exports = {
                       fault=fs.readFileSync(newfolder+'/build/'+StudentErrorFile);
                     }
                     let infoTimesSubmit=new Array(now,point,fault);
-                    db.AppendFileHistorySubmit(id,numtopic,infoTimesSubmit,function(){});
+                    db.AppendFileHistorySubmit(id,numtopic,infoTimesSubmit,function(){
+                      success();
+                                });
                               });
                             });
                           });
@@ -261,7 +269,7 @@ module.exports = {
       db.getCellInData(numtopic,TopicFile,5,function(filecheckpoint){
       db.createXmlFileFromFolder(id,numtopic,function(times_submit){
         xmlcompile.readXmlAndCompile(id,numtopic,times_submit,function(error,success){
-          if(error) db.noteError(id,numtopic,times_submit,'Error In Compile !',function(){result(point);});
+          if(error) db.noteError(id,numtopic,times_submit,error,function(){result(point);});
           else{
             let sourcefolder=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+times_submit+'/build';
             copyandmove.copyFile(__dirname+'/'+LibStdFile,sourcefolder,function(){
@@ -293,7 +301,10 @@ module.exports = {
       let folderbuild=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+times_submit+'/build';
       fs.writeFile(folderbuild+'/'+StudentErrorFile,error,function(err){
        if(err)console.log(err);
-       else success();
+       else {
+         console.log('Note error for '+id+' topic '+numtopic+' Timessubmit '+times_submit+' successfully !');
+         success();
+       }
       });
     },
     getFileResult:function(id,numtopic,arrnum,success){
@@ -330,7 +341,46 @@ module.exports = {
       let newInfoSubmit=infoTimesSubmit[0]+','+infoTimesSubmit[1]+','+infoTimesSubmit[2]+'\r\n';
       fs.appendFile(historyTopic,newInfoSubmit,function(err){
         if(err) console.log(err);
+        else {
+          console.log('Append file history for '+id+' topic '+numtopic);
+        }
       });
+    },
+    GetaLineInCsvFile:function(id,source,onsuccess){
+      linereader.eachLine(source,function(line,last){
+        let separate=line.split(',');
+        if(separate[0]==id){
+          let data=[];
+          for(let i=0;i<separate.length;++i){
+            data.push(separate[i]);
+          }
+          onsuccess(data);
+        }
+      });
+    },
+    RankTopic:function(numtopic,typerank,typesort,success){
+      let db=require('./testdatabase.js');
+      let NowTopicFile=SumaryPointFolder+'/'+PrefixOfTopicFile+numtopic+'.csv';
+      let numStudent=db.getNowNumStudent(DataStudentFile);
+      childprocess.execSync(SumaryPointFolder+'/'+PrefixOfRankTopicFile+'.exe '+PrefixOfTopicFile+numtopic+'.csv '+typerank+' '+typesort+' > rank'+numtopic+'.txt',{cwd:SumaryPointFolder});
+    },
+    getNowNumStudent:function(source){
+      let data=fs.readFileSync(source,'utf8');
+      let arr=data.split('\n');
+      return arr.length-2;
+    },
+    getRankTopic:function(numtopic,typerank,typesort,success){
+      let db=require('./testdatabase.js');
+      if(Number(typerank)>0){
+      db.RankTopic(numtopic,typerank,typesort,function(){});
+      let NowRankTopicFile=SumaryPointFolder+'/'+PrefixOfRankTopicFile+numtopic+'.txt';
+      let rankTable=[];
+      linereader.eachLine(NowRankTopicFile,function(line,last){
+        let seperate=line.split(',');
+        rankTable.push(seperate);
+        if(last) success(rankTable);
+      });
+     }
     }
 }
 
@@ -341,6 +391,9 @@ module.exports = {
   //  console.log(now);
     //console.log(time);
    //let db=require('./testdatabase.js');
+   //db.getRankTopic('1',function(){});
+   //let numStudent=db.getNowNumStudent(DataStudentFile);
+   //console.log('num '+numStudent);
    //db.AppendFileHistorySubmit('1611111','1','ahihi',function(){});
   //     db.GetTimesSubmitOfStudent('1611111',1,function(times_submit){
   //       console.log('times_submit '+times_submit);

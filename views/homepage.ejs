@@ -5,7 +5,6 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="css/normalize.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&amp;subset=vietnamese" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">    
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/tabs.css">
     <link rel="stylesheet" href="css/main.css">
@@ -13,16 +12,31 @@
     <script src="jquery.js"></script>
     <script src="socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="socket.io-file-client.js"></script>
     <script src="js/tabs.js"></script>
-    <script src="js/main.js"></script>
 </head>
 
 <body>
-    <div class="background">
+    <div class="auth-container" id="form_login">
+            <div class="auth-header">LOG IN</div>
+        <form action="javascript:void(0);">
+            <div class="auth-field">
+                <input type="text" name="username" id="username" placeholder="Username" class="ghinhandata" />
+            </div>
+            <div class="auth-field">
+                <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata" />
+            </div>
+            <div class="auth-field">
+                <input type="submit" value="Log in" name="submit" class="btn-login" style="text-align:center" id="btnlogin" />
+            </div>
+            <div class="auth-status">
+                <p id="status"></p>
+            </div>
+        </form>
+        <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>
     </div>
-    
-    <div class="auth-container" id="form-signup">
-        <div class="auth-header">SIGN UP</div>
+    <div class="auth-container" id="form_signup">
+            <div class="auth-header">SIGN UP</div>
         <form action="javascript:void(0);">
             <div class="auth-field">
                 <input type="text" name="username" id="Susername" placeholder="Username" class="ghinhandata" />
@@ -44,85 +58,83 @@
             </div>
         </form>
         <div class="auth-footer"> Already have an account? <a class="auth-link" id="login-link">Log in!</a></div>
-
     </div>
-    <div class="auth-container" id="form-login">
-        <div class="auth-header">LOG IN</div>
-        <form action="javascript:void(0);">
-            <div class="auth-field">
-                <input type="text" name="username" id="username" placeholder="Username" class="ghinhandata" />
-            </div>
-            <div class="auth-field">
-                <input type="password" name="password" id="password" placeholder="Password" class="ghinhandata" />
-            </div>
-            <div class="auth-field">
-                <input type="submit" value="Log in" name="submit" class="btn-login" style="text-align:center" id="btnlogin" />
-            </div>
-            <div class="auth-status">
-                <p id="status"></p>
-            </div>
-        </form>
-        <div class="auth-footer">Don't have an account? <a class="auth-link" id="signup-link">Sign up now!</a></div>
-    </div>
-    <div id="form-submit">
+    <div id="form_submit">
         <div class="tab">
             <button class="tablinks" onclick="openCity(event, 'London')">Submit</button>
             <button class="tablinks" onclick="openCity(event, 'Paris')" id="tabHistory">Points</button>
-            <button class="tablinks" onclick="openCity(event, 'Seoul')">Chat</button>
-            <button class="tablinks" onclick="openCity(event, 'Tokyo')">Rank</button>
+            <button class="tablinks" onclick="openCity(event, 'Seoul')" id="chatField">Chat</button>
+            <button class="tablinks" onclick="openCity(event, 'Tokyo')" id="tabRank">Rank</button>
             <button class="logout" style="float:right;color:white" onclick="logout()">Log out</button>
         </div>
+        <div class="head_topic">
+            <p style="display:inline;font-size:23px;color:white"><b>Topic: </b></p>
+            <select id="selectedTopic">
+              <option value="0" selected="selected">Choose Topic</option>
+              <option value="1">Topic 1</option>
+              <option value="2">Topic 2</option>
+            </select>
+        </div>
         <div id="London" class="tabcontent">
-            <form action="/submitfile" method="post" enctype="multipart/form-data">
-                <div style="width:45%">
-                    <h4 style="font-family:'Leelawadee UI';" id="nowuser" name="nowuser"></h4>
-                    <input type="hidden" id="idnowuser" name="idnowuser" readonly=true></input>
-                    <input type="hidden" id="nowtopic" name="nowtopic" readonly=true></input>
-                </div>
+            <div style="width:45%">
+              <h4 style="font-family:'Leelawadee UI';" id="nowuser" name="nowuser"></h4>
+              <input type="hidden" id="idnowuser" name="idnowuser" readonly=true></input>
+              <input type="hidden" id="nowtopic" name="nowtopic" readonly=true></input>
+            </div>
                 <div style="height:50%;width:45%;float:left">
                 <fieldset style="height:100%;width:100%">
-                <legend>Submit</legend>
-                <div class="head_topic">
-                    <p style="display:inline;font-size:23px"><b>Topic: </b></p>
-                    <select id="selectedTopic">
-                      <option value="0" selected="selected">Chọn Topic</option>
-                      <option value="1">Topic 1</option>
-                      <option value="2">Topic 2</option>
-                    </select>
-                </div>
+                <legend><b>Submit</b></legend>
                 <div style="height:100px;width:100%;overflow:scroll">
                      <p id="contentTopic"><b><i></i></b></p>
                 </div>
                 <div style="width:100%;float:right">
-                    <input type="file" id="file" name="file" style="content:'Main file'"></input><br>
-                    <input class="subpro" type="submit" id="send_file" onclick="" />
+                  <form id="form" >
+                    <input type="file" id="file" name="file" style="content:'Main file'" multiple></input><br>
+                    <input class="subpro" type="submit" id="send_file" value="Upload" />
+                  </form>
+                  <button id="compilebtn" class="subpro">Compile</buton>
+                  <button id="btn_view_result" class="subpro">View Result</button>
                 </div>
               </fieldset>
             </div>
               <div style="text-align:left;font-size:23px;height:50%;width:45%;float:right;display:inline">
                   <fieldset>
-                  <legend>Result</Legend>
+                  <legend><b>Result</b></Legend>
                   <fieldset>
-                  <legend>Topic Result</Legend>
+                  <legend><b>Topic Result</b></Legend>
                   <div id="pa_result" style="height:120px;width:100%;border:1px solid #ccc;font:16px/26px Georgia,Garamond,Serif;overflow:scroll;"></div>
                   </fieldset>
                   <fieldset>
-                  <legend>Error</Legend>
+                  <legend><b>Error</b></Legend>
                   <p id="Error" style="height:80px;width:100%;border:1px solid #ccc;font:16px/26px Georgia,Garamond,Serif;overflow:scroll;"></p>
                   </fieldset>
                   <h4 id="Point">Point: 0</h4>
                   </fieldset>
               </div>
-            </form>
-            <div style="float:right" id="view_result">
-                <button id="btn_view_result">Xem kết quả</button>
+              <br></br>
+              <div style="text-align:left;font-size:20px;height:50%;width:45%;float:left">
+              <fieldset>
+              <legend><b>Status</b></legend>
+              <div style="width:100%">
+              <p><b>Rule: You will save all files in your project in a folder and zip this folder with extention .zip</b><p>
+              </div>
+              <div style="width:100%">
+              <p id="statusSendFile"><b>Status: </b><p>
+              </div>
+              </fieldset>
             </div>
         </div>
         <div id="Paris" class="tabcontent">
-            <fieldset style="width:50%">
-            <legend>History Table</legend>
-            <div id="scorePoint">
-            <table id="historyTable">
+            <fieldset style="width:45%;float:left">
+            <legend><b>Now User</b></legend>
+            <h4 id='nowaccname'>Account: </h4>
+            <h4 id='nowusername'>User Name: </h4>
+            <h4 id='nowemail'>Email Contact: </h4>
+            </fieldset>
+            <fieldset style="width:45%;float:right">
+            <legend><b>History Table</b></legend>
+            <div id="scorePoint" style="width:100%;height:500px;overflow:auto">
+            <table id="historyTable" style="width:100%">
               <thead>
               <tr>
                 <th>Time</th>
@@ -138,11 +150,66 @@
           </fieldset>
         </div>
         <div id="Tokyo" class="tabcontent">
-            <div id="rank">
-
+          <fieldset style="width:30%;float:left;" >
+          <legend><b>Set Type Rank</b></legend>
+          <p style="display:inline;font-size:23px;"><b>Type Rank: </b></p>
+          <select id="selectedTypeRank">
+            <option value="0" selected="selected">Choose type rank</option>
+            <option value="1">Times Submit</option>
+            <option value="2">Point</option>
+          </select>
+          <br></br>
+          <fieldset style="width:60%">
+          <legend><b>Type Sort</b></legend>
+          <div style="width:100%" id="typeSort">
+            <input type="radio" name="gender" value="1"><b>Ascending</b><br>
+            <input type="radio" name="gender" value="0" checked="checked"><b>Descending</b><br>
+          </div>
+          </fieldset>
+          <p style="display:inline;font-size:23px;" id="yourRank"><b>Your Rank: None</b></p>
+          </fieldset>
+          <fieldset style="width:45%;float:right">
+          <legend><b>Rank Table</b></legend>
+            <div id="rank" style="width:100%;height:500px;overflow:auto">
+              <table id="rankTable" style="width:100%">
+                <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>Submiting Times</th>
+                  <th>Point</th>
+                </tr>
+               </thead>
+                <tbody>
+                <tr><td>Empty</td><td>Empty</td><td>Empty</td></tr>
+               </tbody>
+              </table>
             </div>
         </div>
-    </div>
+        <div id="Seoul" class="tabcontent">
+        <fieldset>
+        <legend><b>Forum</b></legend>
+        <div style="width:100%;height:300px;overflow:scroll" id="forumChat">
+        </div>
+        </fieldset>
+        <div style="width:45%;float:left">
+        <fieldset style="width:100%">
+        <legend><b>Message</b></legend>
+        <div style="width:100%;height:100px;overflow:scroll" id="messageChat">
+        <input id="inputMessage" type="text" placeholder="Your Message" class="ghinhandata"></input>
+        <button id="sendMessagebtn" class="subpro">Send</button>
+        </div>
+       </fieldset>
+       </div>
+       <div style="width:45%;float:right">
+        <fieldset style="width:100%">
+        <legend><b>Online</b></legend>
+       <div style="width:100%;height:100px;overflow:scroll" id="listOnlines">
+       </div>
+        </fieldset>
+      </div>
+        </div>
+      </div>
+      <script src="js/main.js"></script>
 </body>
 
 </html>
