@@ -1,20 +1,31 @@
 var socket = io('http://localhost:3000');
 var uploader = new SocketIOFileClient(socket);
 var form = document.getElementById('form');
-form.onsubmit = function(ev) {
+// form.onsubmit = function(ev) {
+// 	if(Number($("#selectedTopic").val())>0){
+// 	ev.preventDefault();
+//
+// 	// Send File Element to upload
+// 	var fileEl = document.getElementById('file');
+// 	// var uploadIds = uploader.upload(fileEl);
+//
+// 	// Or just pass file objects directly
+//
+// 	var uploadIds = uploader.upload(fileEl.files);
+//  }
+//  else {alert('Please Choose Your Topic !');
+// 	socket.emit("get_List_Topics",$("#username").val());
+// 	}
+// };
+$("#send_file").click(function(){
 	if(Number($("#selectedTopic").val())>0){
-	ev.preventDefault();
-
-	// Send File Element to upload
-	var fileEl = document.getElementById('file');
-	// var uploadIds = uploader.upload(fileEl);
-
-	// Or just pass file objects directly
-
-	var uploadIds = uploader.upload(fileEl.files);
- }
- else alert('Please Choose Your Topic !');
-};
+		var fileEl = document.getElementById('file');
+		var uploadIds = uploader.upload(fileEl.files);
+	}
+	else {
+		alert('Please Choose Your Topic !');
+	}
+});
 function getHistoryTable(historyTable){
   $("#historyTable  tbody > tr").remove();
   $("#historyTable").append('<tbody>');
@@ -59,6 +70,7 @@ $("#form_signup").hide(2000);
 $("#form_submit").show(1000);
 $("#nowuser").text('Welcome ' + $("#username").val());
 $("#idnowuser").val('Now User: '+$("#username").val());
+socket.emit("get_List_Topics",$("#username").val());
 });
 socket.on('already_authenticated', function(data) {
 $("#status").text('');
@@ -77,8 +89,11 @@ $("#form_submit").show(1000);
 });
 socket.on("your_result",function(data){
 if(data[1]==null) data[1]='None';
-$("#pa_result").text(data[0]);
-$("#Error").text('Error: '+data[1]);
+$("#pa_result  > p").remove();
+for(let i=0;i<data[0].length;++i){
+	$("#pa_result").append('<p>'+data[0][i]+'</p>');
+}
+$("#Error").text(data[1]);
 $("#Point").text('Point: '+data[2]);
 });
 socket.on("Your_Topic",function(contentTopic){
@@ -102,17 +117,33 @@ socket.on("Your_Rank",function(numtopic,typerank,typesort,rankTable){
   }
 });
 socket.on("Error_Upload",function(err){
-	 $("#statusSendFile").text('Fail in uploading this file !');
+	 $("#statusSendFile").text('Status: Fail in uploading this file !');
 });
 socket.on("Success_Upload",function(success){
-	 $("#statusSendFile").text('Uploading file successfully !');
+	 $("#statusSendFile").text('Status: Uploading file successfully !');
 });
-socket.on("forum_chat",function(id,message){
-	 $("#forumChat").append('<div>'+id+': '+message+'</div>');
+socket.on("forum_chat",function(id,message,now){
+	 $("#forumChat").append('<div>'+id+': '+message+' ('+now+') '+'</div>');
 });
 socket.on("List_Online",function(users){
+		$("#listOnlines  > div").remove();
 		for(let i=0;i<users.length;++i){
 			 $("#listOnlines").append('<div>'+users[i]+'</div>');
+		}
+});
+socket.on("History_Message",function(arrLineMessage){
+		$("#forumChat  > div").remove();
+		for(let i=0;i<arrLineMessage.length;++i){
+			$("#forumChat").append('<div>'+arrLineMessage[i][0]+': '+arrLineMessage[i][1]+' ('+arrLineMessage[i][2]+') '+'</div>');
+		}
+});
+socket.on("List_Topics",function(data){
+		$("#selectedTopic > option").remove();
+		$("#contentTopic").text('');
+		$("#selectedTopic").append('<option value="'+0+'" selected="selected">'+'Choose Topic</option>');
+		for(let i=0;i<Number(data);++i){
+			let temp=i+1;
+			$("#selectedTopic").append('<option value="'+temp+'">'+'Topic '+temp+'</option>');
 		}
 });
 $(document).ready(function() {
@@ -130,7 +161,7 @@ if ($("#username").val() == '') {
 				$("#compilebtn").hide();
         $("#btn_view_result").hide();
         $("#form_submit").hide();
-    }
+			}
 }
 
 $("#btnlogin").click(function() {
@@ -212,14 +243,22 @@ $("#compilebtn").click(function(){
 	socket.emit("compile",$("#username").val());
 	$("#compilebtn").hide(1000);
 	$("#btn_view_result").show(5000);
+	$("#statusSendFile").text('Status: ');
 });
 $("#sendMessagebtn").click(function(){
 		if($("#inputMessage").val()!=''){
 			 socket.emit("chat",$("#username").val(),$("#inputMessage").val());
+			 $("#inputMessage").val('');
 		}
 		else alert('Please type your message !')
 });
 $("#chatField").click(function(){
 		socket.emit("online",$("#username").val());
+});
+$("#logoutbtn").click(function(){
+		$("#listOnlines  > div").remove();
+});
+$("#tabSubmit").click(function(){
+
 });
 });

@@ -28,6 +28,6 @@ void process(string filenameout,float* arr, int n)
 		if (arr[i] > max) max = arr[i];
 		if (arr[i] < min) min = arr[i];
 	}
-	file << s << " " <<max<< " " << min << " " << s / float(n) << endl
+	file << s << " " <<max<< " " << min << " " << s / float(n) << endl;
 	file.close();
 }

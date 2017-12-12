@@ -22,7 +22,7 @@ function openCity(evt, cityName) {
 function logout() {
     let socket = io();
     Cookies.remove('auth');
-    socket.emit("logout");
+    socket.emit("logout",$("#username").val());
     $("#form_login").show(1000);
     $("#password").val('');
     $("#form_submit").hide(2000);

@@ -61,18 +61,18 @@
     </div>
     <div id="form_submit">
         <div class="tab">
-            <button class="tablinks" onclick="openCity(event, 'London')">Submit</button>
+            <button class="tablinks" onclick="openCity(event, 'London')" id="tabSubmit">Submit</button>
             <button class="tablinks" onclick="openCity(event, 'Paris')" id="tabHistory">Points</button>
             <button class="tablinks" onclick="openCity(event, 'Seoul')" id="chatField">Chat</button>
             <button class="tablinks" onclick="openCity(event, 'Tokyo')" id="tabRank">Rank</button>
-            <button class="logout" style="float:right;color:white" onclick="logout()">Log out</button>
+            <button class="logout" style="float:right;color:white" onclick="logout()" id="logoutbtn">Log out</button>
         </div>
         <div class="head_topic">
             <p style="display:inline;font-size:23px;color:white"><b>Topic: </b></p>
             <select id="selectedTopic">
-              <option value="0" selected="selected">Choose Topic</option>
+              <!-- <option value="0" selected="selected">Choose Topic</option>
               <option value="1">Topic 1</option>
-              <option value="2">Topic 2</option>
+              <option value="2">Topic 2</option> -->
             </select>
         </div>
         <div id="London" class="tabcontent">
@@ -90,9 +90,9 @@
                 <div style="width:100%;float:right">
                   <form id="form" >
                     <input type="file" id="file" name="file" style="content:'Main file'" multiple></input><br>
-                    <input class="subpro" type="submit" id="send_file" value="Upload" />
+                    <input class="subpro" id="send_file" readonly=true value="Upload"></input>
                   </form>
-                  <button id="compilebtn" class="subpro">Compile</buton>
+                  <button id="compilebtn" class="subpro">Compile</button>
                   <button id="btn_view_result" class="subpro">View Result</button>
                 </div>
               </fieldset>

@@ -35,9 +35,12 @@ let TopicFile=LecturerFolder+'/'+'Topic.csv';
 let TopicFolder=__dirname+'/Topic';
 let DataFolder=__dirname+'/Data';
 let DataStudentFolder=__dirname+'/DataStudent';
+let ChatFolder=__dirname+'/Chat';
+let ChatHistoryFile=ChatFolder+'/Chat.csv';
 let DataStudentFile=DataStudentFolder+'/Danhsachsinhvien.csv';
 let PrefixOfHistotySubmitFile='history';
 let linereader=require('line-reader');
+let datetime=require('node-datetime');
 var nowuser=[];
 io.use((socket, next) => {
     sessionMiddleware(socket.request, socket.request.res, next);
@@ -108,9 +111,17 @@ io.on("connection", function (socket) {
         }
     }
     var user='';var topic='';var timessubmit='';
-
+    var weight;
     socket.on("online",function(data){
-       if(!nowuser.includes(data)){nowuser.push(data);}
+       if(nowuser.includes(data)===false){nowuser.push(data);}
+       let arrLineMessage=[];
+       linereader.eachLine(ChatHistoryFile,function(line,last){
+         let seperate=line.split(',');
+         arrLineMessage.push(seperate);
+         if(last){
+           io.sockets.emit("History_Message",arrLineMessage);
+         }
+       });
        io.sockets.emit("List_Online",nowuser);
     });
     socket.on("compile",function(nowuser){
@@ -120,7 +131,9 @@ io.on("connection", function (socket) {
           fs.renameSync(DataFolder+'/'+user+'/topic'+topic+'/'+user+'_'+topic+'.zip',
         DataFolder+'/'+user+'/topic'+topic+'/submit'+now_submit+'.zip');
           console.log('File for '+nowuser+' was in target !');
-            db.unzipFileSubmit(user,topic,times_submit,function(){});
+            db.unzipFileSubmit(user,topic,times_submit,function(arrweight){
+              weight=arrweight;
+            });
         });
       });
       let db=require('./testdatabase.js');
@@ -192,11 +205,11 @@ io.on("connection", function (socket) {
     });
     socket.on("wait_for_point", function (infosubmit) {
         let db=require('./testdatabase.js');
-        db.getListWeightOfTopic(infosubmit[1],function(arrnum,arrweight){
-          db.getFileResult(infosubmit[0],infosubmit[1],arrnum,function(SetResult){
+          db.getFileResult(infosubmit[0],infosubmit[1],weight,function(SetResult){
             socket.emit("your_result",SetResult);
+            console.log('wait: '+weight.length);
           });
-        });
+
     });
     socket.on("signup", function (data) {
         let addNewLine = require('./testdatabase.js');
@@ -222,6 +235,9 @@ io.on("connection", function (socket) {
             socket.request.session.destroy();
             console.log('logged out');
         });
+        let idx=nowuser.indexOf('data');
+        nowuser.splice(idx,1);
+        io.sockets.emit("List_Online",nowuser);
     });
     socket.on("Choose_Topic",function(numtopic){
       dataobj.getCellInData(numtopic,TopicFile,1,function(nametopic){
@@ -251,6 +267,18 @@ io.on("connection", function (socket) {
       });
     });
     socket.on("chat",function(id,message){
-      io.sockets.emit("forum_chat",id,message);
+      let now=datetime.create().format('d-m-Y H:M:S');
+      let lineChatInfo=id+','+message+','+now+'\r\n';
+      fs.appendFile(ChatHistoryFile,lineChatInfo,function(err){
+         if(err) console.log('Error in saving message !');
+      });
+      io.sockets.emit("forum_chat",id,message,now);
+    });
+    socket.on("get_List_Topics",function(data){
+      let dem=0;
+      linereader.eachLine(TopicFile,function(line,last){
+        dem++;
+        if(last) socket.emit("List_Topics",dem-1);
+      });
     });
 });

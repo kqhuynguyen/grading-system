@@ -1,6 +1,6 @@
 Id,TimeSumit,LastPoint
-1611111,1,10
-1612222,1,10
+1611111,0,0
+1612222,0,0
 1613333,0,0
 1614444,0,0
 1615555,0,0
@@ -11,5 +11,3 @@ Id,TimeSumit,LastPoint
 admin,0,0
 ilogin,0,0
 steven,0,0
-
-

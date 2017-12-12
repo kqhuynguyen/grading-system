@@ -58,7 +58,7 @@ module.exports = {
     //
     //      }
     //   },
-    runExeFile: function(id,numtopic,times_submit,numtestcase) {
+    runExeFile: function(id,numtopic,times_submit,numtestcase,nowtime) {
         let db=require('./testdatabase.js');
         let sourceCpp = __dirname + '/Data/' + id +'/topic'+numtopic+ '/submit' + times_submit + '/build/testcase'+numtestcase;
         let folderbuild=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+times_submit+'/build';
@@ -66,8 +66,10 @@ module.exports = {
             childprocess.exec('taskkill /F /IM '+id+'.exe',{},function(err,stdout,stderr){
             if(err) console.log('Run file successfully !');
             else{
-                let typeError='Stack overflow !';
+                let typeError='Stack overflow_____Stack overflow !';
+                let historyFile=__dirname + '/Data/' + id +'/topic'+numtopic+'/history.csv';
                 db.noteError(id,numtopic,times_submit,typeError,function(){});
+                db.editCellInData(nowtime,historyFile,'2','Stack overflow',function(){});
              }
             });
         }, 3000);

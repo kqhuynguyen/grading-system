@@ -1,3 +1,5 @@
+let PrefixOfSetTestcase='SetTestcase';
+let PrefixOfSetResult='SetResult';
 let PrefixOfInputFile='input';
 let PrefixOfResultFile='result';
 let PrefixOfOutputFile='output';
@@ -14,8 +16,8 @@ let TempFolderExecute=__dirname+'/Data/execute_exe';
 let CreateTestcaseFolder=__dirname+'/CreateTestcase';
 let RunTestcaseFolder=__dirname+'/RunTestcase';
 let CheckPointFolder=__dirname+'/CheckPoint';
+let CheckPointFile="checkpoint2";
 let LecturerFolder=__dirname+'/Lecturer';
-let TestcaseFolder=__dirname+'/Testcase';
 let StudentOutputFile='output.txt';
 let StudentErrorFile='error.txt';
 let AccountFile=DataStudentFolder+'/'+'Account.csv';
@@ -30,6 +32,7 @@ let extract = require('extract-zip');
 let xmlcompile=require('./xml_compile.js');
 let xmlbuild = require('xmlbuilder');
 let datetime=require('node-datetime');
+let random=require('random-js')();
 function return_timesubmit(timesSubmit) {
     return timesSubmit;
 }
@@ -115,12 +118,6 @@ module.exports = {
         let data=fs.readFileSync(sourcefolderold+'/'+oldname);
         fs.writeFileSync(sourcefoldernew+'/'+newname,data,'utf8');
     },
-    // copyandrename: function(sourcefolder, oldname,newname,success) {
-    //     let data=fs.readFileSync(sourcefolder+'/'+oldname);
-    //     fs.writeFile(sourcefolder+'/'+newname,data,'utf8',function(){
-    //       success();
-    //     });
-    // },
     getCellInData: function(id, source, collum, onsuccess) {
         linereader.eachLine(source, function(line, last) {
             let separate = line.split(',');
@@ -149,15 +146,17 @@ module.exports = {
     },
     getListWeightOfTopic:function(numtopic,onsuccess){
         let db=require('./testdatabase.js');
-        db.getCellInData(numtopic,TopicFile,'2',function(filetestcase){
-          let arrnum=[];let arrweight=[];
-          linereader.eachLine(TestcaseFolder+'/'+filetestcase+'.txt',function(line,last){
-            let separate1=line.split(' ');
-            for(let i = 0;i<separate1.length;++i){
-            let separate2=separate1[i].split(':');
-            arrnum.push(separate2[0]);arrweight.push(separate2[1]);
-              }
-            if(last) onsuccess(arrnum,arrweight);
+        db.GetaLineInCsvFile(numtopic,TopicFile,function(lineInfoTopic){
+          let arrweight=[];let max_range=Number(lineInfoTopic[3]);
+          //let nowtestcase=random.integer(1,max_range);
+          let nowtestcase=2;
+          console.log("Now Testcase "+nowtestcase);
+          linereader.eachLine(CreateTestcaseFolder+'/'+lineInfoTopic[2]+'/'+PrefixOfSetTestcase+nowtestcase+'/'+PrefixOfSetTestcase+'.txt',function(line,last){
+            let seperate=line.split(' ');
+            for(let i=0;i<seperate.length;++i){
+              arrweight.push(seperate[i]);
+            }
+            if(last) {onsuccess(arrweight,lineInfoTopic,nowtestcase);console.log(arrweight);}
           });
         });
     },
@@ -165,39 +164,28 @@ module.exports = {
        let db=require('./testdatabase.js');
        let builddir=DataFolder+'/'+id+'/topic'+nowtopic+'/submit'+now_submit+'/build';
        fs.mkdirSync(builddir);
-       db.getListWeightOfTopic(nowtopic,function(arrnum,arrweight){
-         db.getCellInData(nowtopic,TopicFile,'3',function(filecreatetestcase){
-            for(let i = 0;i<arrnum.length;++i){
-              let numtestcasefile=builddir+'/numtestcase'+(i+1)+'.txt'
-              fs.writeFile(numtestcasefile,arrnum[i],function(err){
-                if(err) console.log(err);
-                childprocess.exec(CreateTestcaseFolder+'/'+filecreatetestcase+'.exe'+' <numtestcase'+(i+1)+'.txt> '+PrefixOfInputFile+(i+1)+'.txt',{cwd:builddir},
-              function(err,stdout,stderr){
-                if(err)console.log(err);
-                else{
-                      console.log('CreateTestcase for '+id+' topic '+nowtopic+' Timessubmit '+now_submit+' Successfully !');
-                      fs.unlinkSync(numtestcasefile);
-                      if(i==arrnum.length-1)success(arrnum,arrweight);
-                    }
-                  });
-              });
-            }
-          });
-       });
+       db.getListWeightOfTopic(nowtopic,function(arrweight,lineInfoTopic,nowtestcase){
+         let foldernowtopic=CreateTestcaseFolder+'/'+lineInfoTopic[2]+'/'+PrefixOfSetTestcase+nowtestcase;
+         for(let i=0;i<arrweight.length;++i){
+           let itemp=i+1;
+           let testcasetemp=fs.readFileSync(foldernowtopic+'/'+PrefixOfInputFile+itemp+'.txt');
+           fs.writeFileSync(builddir+'/'+PrefixOfInputFile+itemp+'.txt',testcasetemp,'utf8');
+         }
+         success(arrweight,nowtestcase);
+      });
     },
-    runTestcase:function(id,numtopic,now_submit,arrnum,success){
+    runTestcase:function(id,numtopic,now_submit,arrweight,nowtestcase,success){
       let db=require('./testdatabase.js');
-      db.getCellInData(numtopic,TopicFile,4,function(nameruntestcasefile){
-        RunTestcaseFolder=__dirname+'/RunTestcase';
-        let runtestcasefile=RunTestcaseFolder+'/'+nameruntestcasefile+'.exe';
-        let folderbuild=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+now_submit+'/build';
-          for(let i=0;i<arrnum.length;++i){
-            childprocess.exec(runtestcasefile+' <'+PrefixOfInputFile+(i+1)+'.txt> '+PrefixOfResultFile+(i+1)+'.txt',{cwd:folderbuild},function(err,stdout,stderr){
-              if(err) console.log(err);
-              else {if(i==arrnum.length-1) success();}
-            });
-          }
-        });
+      let builddir=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+now_submit+'/build';
+      db.GetaLineInCsvFile(numtopic,TopicFile,function(lineInfoTopic){
+        let foldernowresult=RunTestcaseFolder+'/'+lineInfoTopic[4]+'/'+PrefixOfSetResult+nowtestcase;
+        for(let i=0;i<arrweight.length;++i){
+          let itemp=i+1;
+          let resulttemp=fs.readFileSync(foldernowresult+'/'+PrefixOfResultFile+itemp+'.txt');
+          fs.writeFileSync(builddir+'/'+PrefixOfResultFile+itemp+'.txt',resulttemp,'utf8');
+        }
+        success(arrweight);
+      });
     },
     createXmlFileFromFolder: function(id,numtopic,onsuccess) {
         let db=require('./testdatabase.js');
@@ -242,61 +230,61 @@ module.exports = {
           db.editNameAfterUnzip(tempfolder,newfolder, function() {
            let NowTopicFile=SumaryPointFolder+'/Topic'+numtopic+'.csv';
            db.editCellInData(id, NowTopicFile,1, now_submit, function() {
-            db.prepareTestcase(id,now_submit,numtopic,function(arrnum,arrweight){
-              db.runTestcase(id,numtopic,now_submit,arrnum,function(){
-                db.processProject(id,numtopic,arrnum,arrweight,function(point){
-                  db.editCellInData(id,filetopic,2,point,function(){
-                    let now=datetime.create().format('d-m-Y H:M:S');
-                    let fault='None';
+            db.prepareTestcase(id,now_submit,numtopic,function(arrweight,nowtestcase){
+              db.runTestcase(id,numtopic,now_submit,arrweight,nowtestcase,function(arrweight){
+                  success(arrweight);
+                  let now=datetime.create().format('d-m-Y H:M:S');
+                db.processProject(id,numtopic,arrweight,now,function(now,point){
+                  console.log('Now: '+now);
+                  db.editCellInData(id,filetopic,2,point,function(){});
+                  let fault;let shortError;
                     if(fs.existsSync(newfolder+'/build/'+StudentErrorFile)){
                       fault=fs.readFileSync(newfolder+'/build/'+StudentErrorFile);
+                      shortError=fault.toString('utf8').split('_____')[0];
                     }
-                    let infoTimesSubmit=new Array(now,point,fault);
+                    else {fault='None';shortError=fault;}
+                    let infoTimesSubmit=new Array(now,point,shortError);
                     db.AppendFileHistorySubmit(id,numtopic,infoTimesSubmit,function(){
-                      success();
-                                });
                               });
                             });
-                          });
                         });
-                      });
-                  });
-                }
-            });
+                    });
+                 });
+              });
+            }
+        });
     },
-  processProject:function(id,numtopic,arrnum,arrweight,result){
+  processProject:function(id,numtopic,arrweight,nowtime,result){
       let db=require('./testdatabase.js');let point=0;
-      db.getCellInData(numtopic,TopicFile,5,function(filecheckpoint){
       db.createXmlFileFromFolder(id,numtopic,function(times_submit){
         xmlcompile.readXmlAndCompile(id,numtopic,times_submit,function(error,success){
-          if(error) db.noteError(id,numtopic,times_submit,'Error In Compile !',function(){result(point);});
+          if(error) db.noteError(id,numtopic,times_submit,'Error in compile_____'+error,function(){result(nowtime,point);});
           else{
             let sourcefolder=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+times_submit+'/build';
             copyandmove.copyFile(__dirname+'/'+LibStdFile,sourcefolder,function(){
-              for(let i=0;i<arrnum.length;++i){
+              for(let i=0;i<arrweight.length;++i){
                 let temp=i+1;
                 fs.mkdirSync(sourcefolder+'/testcase'+temp);
                 let newsource=sourcefolder+'/testcase'+temp;
                 db.copyandrename(sourcefolder,PrefixOfInputFile+temp+'.txt',newsource,PrefixOfInputFile+'.txt');
               }
               setTimeout(function(){
-               for(let i=0;i<arrnum.length;++i){
+               for(let i=0;i<arrweight.length;++i){
                  let temp=i+1;
-                 let pointoftest=xmlcompile.grading(id,numtopic,times_submit,filecheckpoint,temp);
+                 let pointoftest=xmlcompile.grading(id,numtopic,times_submit,CheckPointFile,temp);
                  point+=Number(pointoftest)*Number(arrweight[i]);
-                 if(i==arrnum.length-1) result(point);
+                 if(i==arrweight.length-1) result(nowtime,point);
                }
               },1500);
-              for(let i=0;i<arrnum.length;++i){
+              for(let i=0;i<arrweight.length;++i){
                 let temp=i+1;
-                xmlcompile.runExeFile(id,numtopic,times_submit,temp);
+                xmlcompile.runExeFile(id,numtopic,times_submit,temp,nowtime);
               }
             });
         }
        });
      });
-   });
-  },
+   },
     noteError:function(id,numtopic,times_submit,error,success){
       let folderbuild=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+times_submit+'/build';
       fs.writeFile(folderbuild+'/'+StudentErrorFile,error,function(err){
@@ -311,18 +299,18 @@ module.exports = {
       let db=require('./testdatabase.js');
       db.GetTimesSubmitOfStudent(id,numtopic,function(now_submit) {
       let folderbuild=DataFolder+'/'+id+'/topic'+numtopic+'/submit'+now_submit+'/build';
-      let data='';let SetResult=[];
+      let data=[];let SetResult=[];
       for(let i=0;i<arrnum.length;++i){
         let result='';let temp=i+1;
         if(fs.existsSync(folderbuild+'/testcase'+temp+'/'+PrefixOfOutputFile+temp+'X.txt')){
           result=fs.readFileSync(folderbuild+'/testcase'+temp+'/'+PrefixOfOutputFile+temp+'X.txt','utf8');
         }
-        data+=result+'.';
+        data.push(result+'.');
       }
       SetResult.push(data);
       if(fs.existsSync(folderbuild+'/'+StudentErrorFile)){
         let err=fs.readFileSync(folderbuild+'/'+StudentErrorFile,'utf8');
-        SetResult.push(err);
+        SetResult.push(err.split('_____')[1]);
       }else SetResult.push(null);
       let nowtopicfile=SumaryPointFolder+'/Topic'+numtopic+'.csv';
       db.getCellInData(id,nowtopicfile,2,function(point){
@@ -383,7 +371,29 @@ module.exports = {
      }
     }
 }
+    // let data=fs.readFileSync(TopicFile,'utf8');
+    // let seperate=data.split('\r\n');
+    // console.log(seperate.length-2);
 
+    // var a=0;
+    // console.log('bd: '+a);
+    // function testref(inp,success){
+    //   inp=10;
+    //   success(inp);
+    // }
+    // testref(a,function(res){
+    //   console.log('ls: '+a);
+    // });
+
+    // let arr=[];
+    // arr.push('a');arr.push('b');arr.push('c');
+    // console.log('Array '+arr);
+    // let idx=arr.indexOf('a');
+    // arr.splice(idx,1);
+    // console.log('Now Array '+arr);
+    //if(arr.includes('a')===true) console.log('exist !');
+    //if(arr.includes('a')===false) console.log('not exist !');
+    //console.log('exist '+arr.includes('a'));
 
 
     //let now=datetime.create();
